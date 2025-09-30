@@ -1,3 +1,5 @@
+import 'package:carbon_it_images_search/data/entities/image_entity.dart';
+import 'package:carbon_it_images_search/data/entities/image_source_entity.dart';
 import 'package:carbon_it_images_search/domain/repositories/images_search_repository.dart';
 import 'package:carbon_it_images_search/presentation/view_models/search_screen_view_model.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -15,7 +17,19 @@ void main() {
 
     test('When a search is submitted and repository returns a list of items, should set state items', () async {
       // Given
-      final List<String> repositorySuccessResult = ['Test00', 'Test01'];
+      final ImageSourceEntity imageSourceEntity = ImageSourceEntity(
+        original: 'original',
+        large: 'large',
+        medium: 'medium',
+        small: 'small',
+        portrait: 'portrait',
+        landscape: 'landscape',
+        tiny: 'tiny',
+      );
+      final List<ImageEntity> repositorySuccessResult = [
+        ImageEntity(id: 'id1', url: 'url1', source: imageSourceEntity),
+        ImageEntity(id: 'id2', url: 'url2', source: imageSourceEntity),
+      ];
       when(imagesSearchRepository.searchImages(search: searchValue)).thenAnswer((_) async => repositorySuccessResult);
 
       // When
@@ -25,7 +39,7 @@ void main() {
       expect(viewModel.state.isLoading, false);
       expect(viewModel.state.errorMessage, null);
       expect(viewModel.state.imagesItems.length, 2);
-      expect(viewModel.state.imagesItems, ['Test00', 'Test01']);
+      expect(viewModel.state.imagesItems, repositorySuccessResult);
     });
 
     test('When a search is submitted, should set state to loading', () {

@@ -1,3 +1,4 @@
+import 'package:carbon_it_images_search/data/entities/image_entity.dart';
 import 'package:carbon_it_images_search/injection.dart';
 import 'package:carbon_it_images_search/presentation/view_models/search_screen_view_model.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,12 @@ class _SearchScreenState extends State<SearchScreen> {
               },
             ),
           ),
-          _SearchResults(),
+          Expanded(
+            child: AnimatedBuilder(
+              animation: _searchScreenViewModel,
+              builder: (BuildContext context, _) => _SearchResults(images: _searchScreenViewModel.state.imagesItems),
+            ),
+          ),
         ],
       ),
     );
@@ -42,8 +48,21 @@ class _SearchScreenState extends State<SearchScreen> {
 }
 
 class _SearchResults extends StatelessWidget {
+  final List<ImageEntity> images;
+
+  const _SearchResults({required this.images});
+
   @override
   Widget build(BuildContext context) {
-    return Container();
+    if (images.isEmpty) {
+      return Container();
+    }
+    return GridView.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+      itemCount: images.length,
+      itemBuilder: (BuildContext context, index) {
+        return Padding(padding: EdgeInsets.all(8), child: Image.network(images[index].source.tiny));
+      },
+    );
   }
 }

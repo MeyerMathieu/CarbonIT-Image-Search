@@ -48,6 +48,7 @@ void main() {
 
       // Then
       expect(viewModel.state.isLoading, true);
+      expect(viewModel.state.lastQuery, searchValue);
       expect(viewModel.state.errorMessage, null);
       expect(viewModel.state.imagesItems.length, 0);
     });
@@ -62,6 +63,7 @@ void main() {
 
       // Then
       expect(viewModel.state.isLoading, false);
+      expect(viewModel.state.lastQuery, searchValue);
       expect(viewModel.state.errorMessage, repositoryErrorMessage);
       expect(viewModel.state.imagesItems.length, 0);
     });

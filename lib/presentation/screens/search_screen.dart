@@ -21,6 +21,7 @@ class _SearchScreenState extends State<SearchScreen> {
       body: Column(
         children: [
           _SearchBar(
+            searchScreenViewModel: _searchScreenViewModel,
             searchTextEditingController: _searchTextEditingController,
             onSearchSubmitted: (value) {
               _searchScreenViewModel.submitSearch(searchValue: value);
@@ -45,18 +46,58 @@ class _SearchScreenState extends State<SearchScreen> {
 }
 
 class _SearchBar extends StatelessWidget {
+  final SearchScreenViewModel searchScreenViewModel;
   final TextEditingController searchTextEditingController;
   final Function(String) onSearchSubmitted;
 
-  const _SearchBar({required this.searchTextEditingController, required this.onSearchSubmitted});
+  const _SearchBar({
+    required this.searchScreenViewModel,
+    required this.searchTextEditingController,
+    required this.onSearchSubmitted,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      child: TextField(controller: searchTextEditingController, onSubmitted: onSearchSubmitted),
+      child: ListenableBuilder(
+        listenable: searchScreenViewModel,
+        builder:
+            (BuildContext context, _) => TextField(
+              controller: searchTextEditingController,
+              onSubmitted: (newValue) {
+                _performSearch(context);
+              },
+              enabled: !searchScreenViewModel.state.isLoading,
+              decoration: InputDecoration(
+                hintText: 'Search images',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                suffixIcon: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: IconButton(
+                    tooltip: 'Search',
+                    icon:
+                        (searchScreenViewModel.state.isLoading)
+                            ? Transform.scale(scale: 0.5, child: CircularProgressIndicator())
+                            : Icon(Icons.search),
+                    onPressed: () => _performSearch(context),
+                  ),
+                ),
+              ),
+            ),
+      ),
     );
   }
+
+  void _performSearch(BuildContext context) {
+    final textFieldContent = searchTextEditingController.text.trim();
+    onSearchSubmitted(textFieldContent);
+    _hideKeyboard(context);
+  }
+
+  void _hideKeyboard(BuildContext context) => FocusScope.of(context).unfocus();
 }
 
 class _Body extends StatelessWidget {

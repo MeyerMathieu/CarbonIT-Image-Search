@@ -17,22 +17,19 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('TEST')),
+      appBar: AppBar(title: Text('CarbonIT Images search')),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            child: TextField(
-              controller: _searchTextEditingController,
-              onSubmitted: (value) {
-                _searchScreenViewModel.submitSearch(searchValue: value);
-              },
-            ),
+          _SearchBar(
+            searchTextEditingController: _searchTextEditingController,
+            onSearchSubmitted: (value) {
+              _searchScreenViewModel.submitSearch(searchValue: value);
+            },
           ),
           Expanded(
             child: AnimatedBuilder(
               animation: _searchScreenViewModel,
-              builder: (BuildContext context, _) => _SearchResults(images: _searchScreenViewModel.state.imagesItems),
+              builder: (BuildContext context, _) => _Body(images: _searchScreenViewModel.state.imagesItems),
             ),
           ),
         ],
@@ -47,22 +44,69 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 }
 
-class _SearchResults extends StatelessWidget {
+class _SearchBar extends StatelessWidget {
+  final TextEditingController searchTextEditingController;
+  final Function(String) onSearchSubmitted;
+
+  const _SearchBar({required this.searchTextEditingController, required this.onSearchSubmitted});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      child: TextField(controller: searchTextEditingController, onSubmitted: onSearchSubmitted),
+    );
+  }
+}
+
+class _Body extends StatelessWidget {
+  static const double _paddingBetweenItems = 4;
+  static const int _itemsPerLine = 2;
+
   final List<ImageEntity> images;
 
-  const _SearchResults({required this.images});
+  const _Body({required this.images});
 
   @override
   Widget build(BuildContext context) {
     if (images.isEmpty) {
-      return Container();
+      return _EmptyState();
     }
     return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: _itemsPerLine,
+        crossAxisSpacing: _paddingBetweenItems,
+        mainAxisSpacing: _paddingBetweenItems,
+      ),
       itemCount: images.length,
-      itemBuilder: (BuildContext context, index) {
-        return Padding(padding: EdgeInsets.all(8), child: Image.network(images[index].source.tiny));
-      },
+      itemBuilder: (BuildContext context, index) => _ImageItem(image: images[index]),
+      padding: EdgeInsets.all(_paddingBetweenItems),
+    );
+  }
+}
+
+class _ImageItem extends StatelessWidget {
+  final ImageEntity image;
+
+  const _ImageItem({required this.image});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: Image.network(image.source.tiny, fit: BoxFit.cover),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [Text('No item to display.'), Text('Make a search to display images !')],
+      ),
     );
   }
 }

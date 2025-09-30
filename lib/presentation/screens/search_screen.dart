@@ -135,7 +135,29 @@ class _ImageItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
-      child: Image.network(image.source.tiny, fit: BoxFit.cover),
+      child: Image.network(
+        image.source.tiny,
+        fit: BoxFit.cover,
+        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+          if (loadingProgress == null) {
+            return child;
+          }
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              Container(color: Colors.black12),
+              const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))),
+            ],
+          );
+        },
+        errorBuilder:
+            (BuildContext context, Object error, StackTrace? stackTrace) => Container(
+              color: Colors.black12,
+              alignment: Alignment.center,
+              child: const Icon(Icons.broken_image, size: 24),
+            ),
+        gaplessPlayback: true,
+      ),
     );
   }
 }

@@ -45,7 +45,7 @@ void main() {
       verify(
         dio.get(
           'search/',
-          queryParameters: {'query': searchQueryParameter, 'page': pageQueryParameter, 'per_page': any},
+          queryParameters: {'query': searchQueryParameter, 'page': pageQueryParameter, 'per_page': 12},
         ),
       ).called(1);
       expect(result, isNotEmpty);

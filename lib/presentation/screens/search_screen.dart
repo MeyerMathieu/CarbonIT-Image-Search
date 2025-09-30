@@ -1,5 +1,6 @@
 import 'package:carbon_it_images_search/data/entities/image_entity.dart';
 import 'package:carbon_it_images_search/injection.dart';
+import 'package:carbon_it_images_search/presentation/states/search_states.dart';
 import 'package:carbon_it_images_search/presentation/view_models/search_screen_view_model.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +31,7 @@ class _SearchScreenState extends State<SearchScreen> {
           Expanded(
             child: AnimatedBuilder(
               animation: _searchScreenViewModel,
-              builder: (BuildContext context, _) => _Body(images: _searchScreenViewModel.state.imagesItems),
+              builder: (BuildContext context, _) => _Body(state: _searchScreenViewModel.state),
             ),
           ),
         ],
@@ -48,7 +49,7 @@ class _SearchScreenState extends State<SearchScreen> {
 class _SearchBar extends StatelessWidget {
   final SearchScreenViewModel searchScreenViewModel;
   final TextEditingController searchTextEditingController;
-  final Function(String) onSearchSubmitted;
+  final ValueChanged<String> onSearchSubmitted;
 
   const _SearchBar({
     required this.searchScreenViewModel,
@@ -101,12 +102,33 @@ class _SearchBar extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
+  final SearchState state;
+
+  const _Body({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    if (state.isLoading) {
+      return _LoadingState();
+    } else if (state.errorMessage != null) {
+      return _ErrorState(message: state.errorMessage!);
+    } else if (state.lastQuery != null && state.imagesItems.isEmpty) {
+      return _NoImagesFoundState(searchQuery: state.lastQuery!);
+    } else if (state.imagesItems.isEmpty) {
+      return _EmptyState();
+    } else {
+      return _ImagesList(images: state.imagesItems);
+    }
+  }
+}
+
+class _ImagesList extends StatelessWidget {
   static const double _paddingBetweenItems = 4;
   static const int _itemsPerLine = 2;
 
   final List<ImageEntity> images;
 
-  const _Body({required this.images});
+  const _ImagesList({required this.images});
 
   @override
   Widget build(BuildContext context) {
@@ -172,4 +194,34 @@ class _EmptyState extends StatelessWidget {
       ),
     );
   }
+}
+
+class _NoImagesFoundState extends StatelessWidget {
+  final String searchQuery;
+
+  const _NoImagesFoundState({required this.searchQuery});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [Text('No item found for "$searchQuery"'), Text('Try a new search !')],
+      ),
+    );
+  }
+}
+
+class _LoadingState extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Center(child: CircularProgressIndicator());
+}
+
+class _ErrorState extends StatelessWidget {
+  final String message;
+
+  const _ErrorState({required this.message});
+
+  @override
+  Widget build(BuildContext context) => Center(child: Text('ERROR: $message'));
 }

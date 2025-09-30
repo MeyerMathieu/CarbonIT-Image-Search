@@ -10,15 +10,14 @@ class SearchScreenViewModel extends ChangeNotifier {
   SearchScreenViewModel({required this.imagesSearchRepository});
 
   Future<void> submitSearch({required String searchValue}) async {
-    // TODO : Handle empty searchValue
-    state = SearchState.loading();
+    state = state.copyWith(isLoading: true, imagesItems: [], errorMessage: null, lastQuery: searchValue);
     notifyListeners();
     try {
       final List<ImageEntity> results = await imagesSearchRepository.searchImages(search: searchValue);
-      state = SearchState.success(results);
+      state = state.copyWith(isLoading: false, imagesItems: results, errorMessage: null, lastQuery: searchValue);
       notifyListeners();
     } catch (error) {
-      state = SearchState.errorMessage(error.toString());
+      state = state.copyWith(isLoading: false, imagesItems: [], errorMessage: error.toString(), lastQuery: searchValue);
       notifyListeners();
     }
   }

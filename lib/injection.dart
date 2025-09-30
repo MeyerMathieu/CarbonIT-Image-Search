@@ -1,4 +1,4 @@
-import 'package:carbon_it_images_search/domain/repositories/pexels_images_search_repository.dart';
+import 'package:carbon_it_images_search/data/repositories/pexels_images_search_repository.dart';
 import 'package:carbon_it_images_search/presentation/view_models/search_screen_view_model.dart';
 import 'package:carbon_it_images_search/secrets.dart';
 import 'package:dio/dio.dart';

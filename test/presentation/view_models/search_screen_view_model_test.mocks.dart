@@ -5,6 +5,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i3;
 
+import 'package:carbon_it_images_search/data/entities/image_entity.dart' as _i4;
 import 'package:carbon_it_images_search/domain/repositories/images_search_repository.dart'
     as _i2;
 import 'package:mockito/mockito.dart' as _i1;
@@ -30,7 +31,7 @@ import 'package:mockito/mockito.dart' as _i1;
 class MockImagesSearchRepository extends _i1.Mock
     implements _i2.ImagesSearchRepository {
   @override
-  _i3.Future<List<String>> searchImages({
+  _i3.Future<List<_i4.ImageEntity>> searchImages({
     required String? search,
     int? page = 1,
   }) =>
@@ -39,10 +40,12 @@ class MockImagesSearchRepository extends _i1.Mock
               #search: search,
               #page: page,
             }),
-            returnValue: _i3.Future<List<String>>.value(<String>[]),
-            returnValueForMissingStub: _i3.Future<List<String>>.value(
-              <String>[],
+            returnValue: _i3.Future<List<_i4.ImageEntity>>.value(
+              <_i4.ImageEntity>[],
+            ),
+            returnValueForMissingStub: _i3.Future<List<_i4.ImageEntity>>.value(
+              <_i4.ImageEntity>[],
             ),
           )
-          as _i3.Future<List<String>>);
+          as _i3.Future<List<_i4.ImageEntity>>);
 }

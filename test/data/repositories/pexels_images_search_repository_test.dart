@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
-import 'images_search_repository_test.mocks.dart';
+import 'pexels_images_search_repository_test.mocks.dart';
 
 @GenerateNiceMocks([MockSpec<Dio>()])
 void main() {

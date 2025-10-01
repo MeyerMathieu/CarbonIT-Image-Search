@@ -21,4 +21,8 @@ class SearchScreenViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> addItemToFavorites({required ImageEntity imageEntity}) async {
+    // TODO
+  }
 }

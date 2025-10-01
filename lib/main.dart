@@ -1,4 +1,4 @@
-import 'package:carbon_it_images_search/presentation/screens/search_screen.dart';
+import 'package:carbon_it_images_search/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'injection.dart';
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Carbon IT - Images search',
       theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
-      home: const SearchScreen(),
+      home: const HomeScreen(),
     );
   }
 }

@@ -17,25 +17,22 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('CarbonIT Images search')),
-      body: Column(
-        children: [
-          _SearchBar(
-            searchScreenViewModel: _searchScreenViewModel,
-            searchTextEditingController: _searchTextEditingController,
-            onSearchSubmitted: (value) {
-              _searchScreenViewModel.submitSearch(searchValue: value);
-            },
+    return Column(
+      children: [
+        _SearchBar(
+          searchScreenViewModel: _searchScreenViewModel,
+          searchTextEditingController: _searchTextEditingController,
+          onSearchSubmitted: (value) {
+            _searchScreenViewModel.submitSearch(searchValue: value);
+          },
+        ),
+        Expanded(
+          child: AnimatedBuilder(
+            animation: _searchScreenViewModel,
+            builder: (BuildContext context, _) => _Body(state: _searchScreenViewModel.state),
           ),
-          Expanded(
-            child: AnimatedBuilder(
-              animation: _searchScreenViewModel,
-              builder: (BuildContext context, _) => _Body(state: _searchScreenViewModel.state),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

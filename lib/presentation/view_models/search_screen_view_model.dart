@@ -37,7 +37,7 @@ class SearchScreenViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> toggleItemFavorite({required ImageEntity imageEntity}) async {
+  Future<void> toggleItemFavorite({required ImageUiModel imageEntity}) async {
     // TODO
   }
 }

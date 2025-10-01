@@ -1,8 +1,7 @@
-import 'package:carbon_it_images_search/data/entities/image_entity.dart';
-import 'package:carbon_it_images_search/data/entities/image_source_entity.dart';
 import 'package:carbon_it_images_search/data/repositories/hive_favorites_repository.dart';
+import 'package:carbon_it_images_search/presentation/models/image_ui_model.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive_test/hive_test.dart';
 
 void main() {
@@ -20,10 +19,10 @@ void main() {
       final Box<Map<String, dynamic>> box = await Hive.openBox<Map<String, dynamic>>('favorites_v1');
       final HiveFavoritesRepository repository = HiveFavoritesRepository(favoritesBox: box);
       final String imageId = '9';
-      final ImageEntity imageToSave = createTestImageEntity(id: imageId);
+      final ImageUiModel imageToSave = createTestImageUiModel(id: imageId);
 
       // When
-      repository.saveImageToFavorites(imageEntity: imageToSave);
+      repository.saveImageToFavorites(imageUiModel: imageToSave);
 
       // Then
       expect(box.values.length, 1);
@@ -45,30 +44,20 @@ void main() {
       final Box<Map<String, dynamic>> box = await Hive.openBox<Map<String, dynamic>>('favorites_v1');
       await box.putAll({
         '1': {
-          'id': 1,
-          'url': 'url',
-          'src': {
-            'original': 'original',
-            'large': 'large',
-            'medium': 'medium',
-            'small': 'small',
-            'portrait': 'portrait',
-            'landscape': 'landscape',
-            'tiny': 'tiny',
-          },
+          'id': '1',
+          'alt': 'alt',
+          'imageThumbnail': 'imageThumbnail',
+          'originalImage': 'originalImage',
+          'largeImage': 'largeImage',
+          'isFavorite': false,
         },
         '2': {
-          'id': 2,
-          'url': 'url',
-          'src': {
-            'original': 'original',
-            'large': 'large',
-            'medium': 'medium',
-            'small': 'small',
-            'portrait': 'portrait',
-            'landscape': 'landscape',
-            'tiny': 'tiny',
-          },
+          'id': '2',
+          'alt': 'alt',
+          'imageThumbnail': 'imageThumbnail',
+          'originalImage': 'originalImage',
+          'largeImage': 'largeImage',
+          'isFavorite': false,
         },
       });
       final HiveFavoritesRepository repository = HiveFavoritesRepository(favoritesBox: box);
@@ -105,35 +94,25 @@ void main() {
     test('When Hive box contains 2 items, should return list of 2 ImageEntity', () async {
       // Given
       final Box<Map<String, dynamic>> box = await Hive.openBox<Map<String, dynamic>>('favorites_v1');
-      final ImageEntity imageEntity1 = createTestImageEntity(id: '1');
-      final ImageEntity imageEntity2 = createTestImageEntity(id: '2');
+      final ImageUiModel imageEntity1 = createTestImageUiModel(id: '1');
+      final ImageUiModel imageEntity2 = createTestImageUiModel(id: '2');
 
       await box.putAll({
         '1': {
-          'id': 1,
-          'url': 'url',
-          'src': {
-            'original': 'original',
-            'large': 'large',
-            'medium': 'medium',
-            'small': 'small',
-            'portrait': 'portrait',
-            'landscape': 'landscape',
-            'tiny': 'tiny',
-          },
+          'id': '1',
+          'alt': 'alt',
+          'imageThumbnail': 'imageThumbnail',
+          'originalImage': 'originalImage',
+          'largeImage': 'largeImage',
+          'isFavorite': false,
         },
         '2': {
-          'id': 2,
-          'url': 'url',
-          'src': {
-            'original': 'original',
-            'large': 'large',
-            'medium': 'medium',
-            'small': 'small',
-            'portrait': 'portrait',
-            'landscape': 'landscape',
-            'tiny': 'tiny',
-          },
+          'id': '2',
+          'alt': 'alt',
+          'imageThumbnail': 'imageThumbnail',
+          'originalImage': 'originalImage',
+          'largeImage': 'largeImage',
+          'isFavorite': false,
         },
       });
       final HiveFavoritesRepository repository = HiveFavoritesRepository(favoritesBox: box);
@@ -147,18 +126,11 @@ void main() {
   });
 }
 
-ImageEntity createTestImageEntity({required String id}) {
-  return ImageEntity(
-    id: id,
-    url: 'url',
-    source: ImageSourceEntity(
-      original: 'original',
-      large: 'large',
-      medium: 'medium',
-      small: 'small',
-      portrait: 'portrait',
-      landscape: 'landscape',
-      tiny: 'tiny',
-    ),
-  );
-}
+ImageUiModel createTestImageUiModel({required String id}) => ImageUiModel(
+  id: id,
+  alt: 'alt',
+  imageThumbnail: 'imageThumbnail',
+  originalImage: 'originalImage',
+  largeImage: 'largeImage',
+  isFavorite: false,
+);

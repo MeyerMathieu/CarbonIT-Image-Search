@@ -1,32 +1,21 @@
-import 'package:carbon_it_images_search/data/entities/image_entity.dart';
-import 'package:carbon_it_images_search/data/entities/image_source_entity.dart';
+import 'package:carbon_it_images_search/presentation/models/image_ui_model.dart';
 
 class HiveImagesMapper {
-  static Map<String, dynamic> serializeToMap({required ImageEntity imageEntity}) => <String, dynamic>{
-    'id': imageEntity.id,
-    'url': imageEntity.url,
-    'src': <String, dynamic>{
-      'original': imageEntity.source.original,
-      'large': imageEntity.source.large,
-      'medium': imageEntity.source.medium,
-      'small': imageEntity.source.small,
-      'portrait': imageEntity.source.portrait,
-      'landscape': imageEntity.source.landscape,
-      'tiny': imageEntity.source.tiny,
-    },
+  static Map<String, dynamic> serializeToMap({required ImageUiModel imageUiModel}) => <String, dynamic>{
+    'id': imageUiModel.id,
+    'imageThumbnail': imageUiModel.imageThumbnail,
+    'originalImage': imageUiModel.originalImage,
+    'largeImage': imageUiModel.largeImage,
+    'isFavorite': imageUiModel.isFavorite,
+    'alt': imageUiModel.alt,
   };
 
-  static ImageEntity deserializeFromMap({required Map<String, dynamic> map}) => ImageEntity(
+  static ImageUiModel deserializeFromMap({required Map<String, dynamic> map}) => ImageUiModel(
     id: map['id'].toString(),
-    url: map['url'],
-    source: ImageSourceEntity(
-      original: map['src']['original'],
-      large: map['src']['large'],
-      medium: map['src']['medium'],
-      small: map['src']['small'],
-      portrait: map['src']['portrait'],
-      landscape: map['src']['landscape'],
-      tiny: map['src']['tiny'],
-    ),
+    imageThumbnail: map['imageThumbnail'],
+    originalImage: map['originalImage'],
+    largeImage: map['largeImage'],
+    isFavorite: map['isFavorite'],
+    alt: map['alt'],
   );
 }

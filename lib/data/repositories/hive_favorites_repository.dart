@@ -7,7 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 class HiveFavoritesRepository extends FavoritesRepository {
   static const favoritesBoxName = 'favorites';
 
-  final Box<Map> favoritesBox;
+  final Box<Map<String, dynamic>> favoritesBox;
 
   HiveFavoritesRepository({required this.favoritesBox});
 
@@ -23,9 +23,9 @@ class HiveFavoritesRepository extends FavoritesRepository {
   }
 
   @override
-  Future<FavoritesRepositoryResult> removeImageFromFavorites({required int imageId}) async {
+  Future<FavoritesRepositoryResult> removeImageFromFavorites({required String imageId}) async {
     try {
-      await favoritesBox.delete(imageId.toString());
+      await favoritesBox.delete(imageId);
       return FavoritesRepositorySuccessResult();
     } catch (exception) {
       return FavoritesRepositoryErrorResult(exception);
@@ -40,4 +40,19 @@ class HiveFavoritesRepository extends FavoritesRepository {
                 HiveImagesMapper.deserializeFromMap(map: Map<String, dynamic>.from(mapItem)),
           )
           .toList();
+
+  @override
+  Stream<Set<String>> watchFavoritesIds() {
+    return Stream<Set<String>>.multi((controller) {
+      final subscription = favoritesBox.watch().listen((_) {
+        controller.add(_currentFavoritesIds());
+      }, onError: (error) => controller.addError(error));
+
+      controller.add(_currentFavoritesIds());
+
+      controller.onCancel = () => subscription.cancel();
+    });
+  }
+
+  Set<String> _currentFavoritesIds() => favoritesBox.keys.map((key) => key.toString()).toSet();
 }

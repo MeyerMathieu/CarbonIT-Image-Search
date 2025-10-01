@@ -1,8 +1,10 @@
 import 'package:carbon_it_images_search/data/entities/image_entity.dart';
 import 'package:carbon_it_images_search/data/entities/image_source_entity.dart';
+import 'package:carbon_it_images_search/domain/favorites_repository_result.dart';
 import 'package:carbon_it_images_search/domain/repositories/favorites_repository.dart';
 import 'package:carbon_it_images_search/domain/repositories/images_search_repository.dart';
 import 'package:carbon_it_images_search/presentation/models/image_ui_model.dart';
+import 'package:carbon_it_images_search/presentation/states/search_states.dart';
 import 'package:carbon_it_images_search/presentation/view_models/search_screen_view_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -92,36 +94,67 @@ void main() {
   });
 
   group('toggleItemFavorite', () {
-    final ImagesSearchRepository imagesSearchRepository = MockImagesSearchRepository();
-    final FavoritesRepository favoritesRepository = MockFavoritesRepository();
-    final SearchScreenViewModel viewModel = SearchScreenViewModel(
-      imagesSearchRepository: imagesSearchRepository,
-      favoritesRepository: favoritesRepository,
-    );
+    setUpAll(() {
+      provideDummy<FavoritesRepositoryResult>(const FavoritesRepositoryErrorResult(false));
+    });
 
     test('When the item is not in favorites, should add it to repository', () async {
       // Given
-      final ImageEntity imageToAddToFavorites = ImageEntity(
-        id: 'id',
-        url: 'url',
-        source: ImageSourceEntity(
-          original: 'original',
-          large: 'large',
-          medium: 'medium',
-          small: 'small',
-          portrait: 'portrait',
-          landscape: 'landscape',
-          tiny: 'tiny',
-        ),
+      final favoritesRepository = MockFavoritesRepository();
+      final imagesSearchRepository = MockImagesSearchRepository();
+      final SearchScreenViewModel viewModel = SearchScreenViewModel(
+        imagesSearchRepository: imagesSearchRepository,
+        favoritesRepository: favoritesRepository,
       );
+      final ImageUiModel imageToAddToFavorites = ImageUiModel(
+        id: '1',
+        alt: 'alt',
+        imageThumbnail: 'imageThumbnail',
+        originalImage: 'originalImage',
+        largeImage: 'largeImage',
+        isFavorite: false,
+      );
+      viewModel.state = SearchState.success([imageToAddToFavorites]);
+      when(
+        favoritesRepository.saveImageToFavorites(imageUiModel: imageToAddToFavorites),
+      ).thenAnswer((_) async => FavoritesRepositorySuccessResult());
 
       // When
-      viewModel.toggleItemFavorite(imageEntity: imageToAddToFavorites);
+      await viewModel.toggleItemFavorite(imageUiModel: imageToAddToFavorites);
 
       // Then
-      // TODO
+      expect(viewModel.state.imagesItems.first.isFavorite, true);
     });
 
-    test('When the item is already in favorites, should remove it from repository', () async {});
-  }, skip: true);
+    test('When the item is already in favorites, should remove it from repository', () async {
+      // Given
+      final ImageUiModel imageToRemoveFromFavorites = ImageUiModel(
+        id: '1',
+        alt: 'alt',
+        imageThumbnail: 'imageThumbnail',
+        originalImage: 'originalImage',
+        largeImage: 'largeImage',
+        isFavorite: true,
+      );
+      final favoritesRepository = MockFavoritesRepository();
+      when(favoritesRepository.watchFavoritesIds()).thenAnswer((_) => Stream<Set<String>>.value({'1'}));
+      when(
+        favoritesRepository.removeImageFromFavorites(imageId: imageToRemoveFromFavorites.id),
+      ).thenAnswer((_) async => FavoritesRepositorySuccessResult());
+
+      final imagesSearchRepository = MockImagesSearchRepository();
+      final SearchScreenViewModel viewModel = SearchScreenViewModel(
+        imagesSearchRepository: imagesSearchRepository,
+        favoritesRepository: favoritesRepository,
+      );
+      await Future<void>.delayed(Duration.zero);
+      viewModel.state = SearchState.success([imageToRemoveFromFavorites]);
+
+      // When
+      await viewModel.toggleItemFavorite(imageUiModel: imageToRemoveFromFavorites);
+
+      // Then
+      expect(viewModel.state.imagesItems.first.isFavorite, false);
+    });
+  });
 }

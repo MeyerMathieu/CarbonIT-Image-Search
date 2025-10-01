@@ -4,11 +4,12 @@ import 'package:equatable/equatable.dart';
 class ImageEntity extends Equatable {
   final String id;
   final String url;
+  final String? alt;
   final ImageSourceEntity source;
   // TODO : Add other fields
 
-  const ImageEntity({required this.id, required this.url, required this.source});
+  const ImageEntity({required this.id, required this.url, required this.source, this.alt});
 
   @override
-  List<Object?> get props => [id, url, source];
+  List<Object?> get props => [id, url, source, alt];
 }

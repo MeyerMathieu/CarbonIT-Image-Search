@@ -1,7 +1,7 @@
-import 'package:carbon_it_images_search/data/entities/image_entity.dart';
 import 'package:carbon_it_images_search/data/mappers/hive_images_mapper.dart';
 import 'package:carbon_it_images_search/domain/repositories/favorites_repository.dart';
-import 'package:hive/hive.dart';
+import 'package:carbon_it_images_search/presentation/models/image_ui_model.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class HiveFavoritesRepository extends FavoritesRepository {
   static const favoritesBoxName = 'favorites';
@@ -11,9 +11,9 @@ class HiveFavoritesRepository extends FavoritesRepository {
   HiveFavoritesRepository({required this.favoritesBox});
 
   @override
-  Future<void> saveImageToFavorites({required ImageEntity imageEntity}) async {
-    final key = imageEntity.id.toString();
-    await favoritesBox.put(key, HiveImagesMapper.serializeToMap(imageEntity: imageEntity));
+  Future<void> saveImageToFavorites({required ImageUiModel imageUiModel}) async {
+    final key = imageUiModel.id.toString();
+    await favoritesBox.put(key, HiveImagesMapper.serializeToMap(imageUiModel: imageUiModel));
   }
 
   @override
@@ -22,7 +22,7 @@ class HiveFavoritesRepository extends FavoritesRepository {
   }
 
   @override
-  Future<List<ImageEntity>> getFavorites() async =>
+  Future<List<ImageUiModel>> getFavorites() async =>
       favoritesBox.values
           .map(
             (Map<dynamic, dynamic> mapItem) =>

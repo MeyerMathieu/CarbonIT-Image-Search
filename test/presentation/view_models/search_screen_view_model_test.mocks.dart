@@ -6,6 +6,8 @@
 import 'dart:async' as _i3;
 
 import 'package:carbon_it_images_search/data/entities/image_entity.dart' as _i4;
+import 'package:carbon_it_images_search/domain/repositories/favorites_repository.dart'
+    as _i5;
 import 'package:carbon_it_images_search/domain/repositories/images_search_repository.dart'
     as _i2;
 import 'package:mockito/mockito.dart' as _i1;
@@ -40,6 +42,49 @@ class MockImagesSearchRepository extends _i1.Mock
               #search: search,
               #page: page,
             }),
+            returnValue: _i3.Future<List<_i4.ImageEntity>>.value(
+              <_i4.ImageEntity>[],
+            ),
+            returnValueForMissingStub: _i3.Future<List<_i4.ImageEntity>>.value(
+              <_i4.ImageEntity>[],
+            ),
+          )
+          as _i3.Future<List<_i4.ImageEntity>>);
+}
+
+/// A class which mocks [FavoritesRepository].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockFavoritesRepository extends _i1.Mock
+    implements _i5.FavoritesRepository {
+  @override
+  _i3.Future<void> saveImageToFavorites({
+    required _i4.ImageEntity? imageEntity,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#saveImageToFavorites, [], {
+              #imageEntity: imageEntity,
+            }),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
+
+  @override
+  _i3.Future<void> removeImageFromFavorites({required int? imageId}) =>
+      (super.noSuchMethod(
+            Invocation.method(#removeImageFromFavorites, [], {
+              #imageId: imageId,
+            }),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
+
+  @override
+  _i3.Future<List<_i4.ImageEntity>> getFavorites() =>
+      (super.noSuchMethod(
+            Invocation.method(#getFavorites, []),
             returnValue: _i3.Future<List<_i4.ImageEntity>>.value(
               <_i4.ImageEntity>[],
             ),

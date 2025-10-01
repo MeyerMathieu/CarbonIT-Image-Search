@@ -1,6 +1,8 @@
 import 'package:carbon_it_images_search/data/entities/image_entity.dart';
 import 'package:carbon_it_images_search/data/entities/image_source_entity.dart';
+import 'package:carbon_it_images_search/domain/repositories/favorites_repository.dart';
 import 'package:carbon_it_images_search/domain/repositories/images_search_repository.dart';
+import 'package:carbon_it_images_search/presentation/models/image_ui_model.dart';
 import 'package:carbon_it_images_search/presentation/view_models/search_screen_view_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -8,11 +10,15 @@ import 'package:mockito/mockito.dart';
 
 import 'search_screen_view_model_test.mocks.dart';
 
-@GenerateNiceMocks([MockSpec<ImagesSearchRepository>()])
+@GenerateNiceMocks([MockSpec<ImagesSearchRepository>(), MockSpec<FavoritesRepository>()])
 void main() {
   group('submitSearch', () {
     final ImagesSearchRepository imagesSearchRepository = MockImagesSearchRepository();
-    final SearchScreenViewModel viewModel = SearchScreenViewModel(imagesSearchRepository: imagesSearchRepository);
+    final FavoritesRepository favoritesRepository = MockFavoritesRepository();
+    final SearchScreenViewModel viewModel = SearchScreenViewModel(
+      imagesSearchRepository: imagesSearchRepository,
+      favoritesRepository: favoritesRepository,
+    );
     final String searchValue = 'searchValue';
 
     test('When a search is submitted and repository returns a list of items, should set state items', () async {
@@ -30,6 +36,22 @@ void main() {
         ImageEntity(id: 'id1', url: 'url1', source: imageSourceEntity),
         ImageEntity(id: 'id2', url: 'url2', source: imageSourceEntity),
       ];
+      final List<ImageUiModel> resultImagesItems = [
+        ImageUiModel(
+          id: repositorySuccessResult.first.id,
+          imageThumbnail: imageSourceEntity.tiny,
+          originalImage: imageSourceEntity.original,
+          largeImage: imageSourceEntity.large,
+          isFavorite: false,
+        ),
+        ImageUiModel(
+          id: repositorySuccessResult.last.id,
+          imageThumbnail: imageSourceEntity.tiny,
+          originalImage: imageSourceEntity.original,
+          largeImage: imageSourceEntity.large,
+          isFavorite: false,
+        ),
+      ];
       when(imagesSearchRepository.searchImages(search: searchValue)).thenAnswer((_) async => repositorySuccessResult);
 
       // When
@@ -39,7 +61,7 @@ void main() {
       expect(viewModel.state.isLoading, false);
       expect(viewModel.state.errorMessage, null);
       expect(viewModel.state.imagesItems.length, 2);
-      expect(viewModel.state.imagesItems, repositorySuccessResult);
+      expect(viewModel.state.imagesItems, resultImagesItems);
     });
 
     test('When a search is submitted, should set state to loading', () {
@@ -68,4 +90,38 @@ void main() {
       expect(viewModel.state.imagesItems.length, 0);
     });
   });
+
+  group('toggleItemFavorite', () {
+    final ImagesSearchRepository imagesSearchRepository = MockImagesSearchRepository();
+    final FavoritesRepository favoritesRepository = MockFavoritesRepository();
+    final SearchScreenViewModel viewModel = SearchScreenViewModel(
+      imagesSearchRepository: imagesSearchRepository,
+      favoritesRepository: favoritesRepository,
+    );
+
+    test('When the item is not in favorites, should add it to repository', () async {
+      // Given
+      final ImageEntity imageToAddToFavorites = ImageEntity(
+        id: 'id',
+        url: 'url',
+        source: ImageSourceEntity(
+          original: 'original',
+          large: 'large',
+          medium: 'medium',
+          small: 'small',
+          portrait: 'portrait',
+          landscape: 'landscape',
+          tiny: 'tiny',
+        ),
+      );
+
+      // When
+      viewModel.toggleItemFavorite(imageEntity: imageToAddToFavorites);
+
+      // Then
+      // TODO
+    });
+
+    test('When the item is already in favorites, should remove it from repository', () async {});
+  }, skip: true);
 }

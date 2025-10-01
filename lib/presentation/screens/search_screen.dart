@@ -1,5 +1,5 @@
-import 'package:carbon_it_images_search/data/entities/image_entity.dart';
 import 'package:carbon_it_images_search/injection.dart';
+import 'package:carbon_it_images_search/presentation/models/image_ui_model.dart';
 import 'package:carbon_it_images_search/presentation/states/search_states.dart';
 import 'package:carbon_it_images_search/presentation/view_models/search_screen_view_model.dart';
 import 'package:flutter/material.dart';
@@ -123,7 +123,7 @@ class _ImagesList extends StatelessWidget {
   static const double _paddingBetweenItems = 4;
   static const int _itemsPerLine = 2;
 
-  final List<ImageEntity> images;
+  final List<ImageUiModel> images;
 
   const _ImagesList({required this.images});
 
@@ -146,7 +146,7 @@ class _ImagesList extends StatelessWidget {
 }
 
 class _ImageItem extends StatelessWidget {
-  final ImageEntity image;
+  final ImageUiModel image;
 
   const _ImageItem({required this.image});
 
@@ -155,7 +155,7 @@ class _ImageItem extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
       child: Image.network(
-        image.source.tiny,
+        image.imageThumbnail,
         fit: BoxFit.cover,
         loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
           if (loadingProgress == null) {

@@ -29,7 +29,13 @@ class _SearchScreenState extends State<SearchScreen> {
         Expanded(
           child: AnimatedBuilder(
             animation: _searchScreenViewModel,
-            builder: (BuildContext context, _) => _Body(state: _searchScreenViewModel.state),
+            builder:
+                (BuildContext context, _) => _Body(
+                  state: _searchScreenViewModel.state,
+                  onFavoriteToggled: (ImageUiModel imageUiModel) {
+                    _searchScreenViewModel.toggleItemFavorite(imageUiModel: imageUiModel);
+                  },
+                ),
           ),
         ),
       ],
@@ -100,8 +106,9 @@ class _SearchBar extends StatelessWidget {
 
 class _Body extends StatelessWidget {
   final SearchState state;
+  final Function(ImageUiModel) onFavoriteToggled;
 
-  const _Body({required this.state});
+  const _Body({required this.state, required this.onFavoriteToggled});
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +121,7 @@ class _Body extends StatelessWidget {
     } else if (state.imagesItems.isEmpty) {
       return _EmptyState();
     } else {
-      return _ImagesList(images: state.imagesItems);
+      return _ImagesList(images: state.imagesItems, onFavoriteToggled: onFavoriteToggled);
     }
   }
 }
@@ -124,8 +131,9 @@ class _ImagesList extends StatelessWidget {
   static const int _itemsPerLine = 2;
 
   final List<ImageUiModel> images;
+  final Function(ImageUiModel) onFavoriteToggled;
 
-  const _ImagesList({required this.images});
+  const _ImagesList({required this.images, required this.onFavoriteToggled});
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +147,8 @@ class _ImagesList extends StatelessWidget {
         mainAxisSpacing: _paddingBetweenItems,
       ),
       itemCount: images.length,
-      itemBuilder: (BuildContext context, index) => _ImageItem(image: images[index]),
+      itemBuilder:
+          (BuildContext context, index) => _ImageItem(image: images[index], onFavoriteToggled: onFavoriteToggled),
       padding: EdgeInsets.all(_paddingBetweenItems),
     );
   }
@@ -147,35 +156,57 @@ class _ImagesList extends StatelessWidget {
 
 class _ImageItem extends StatelessWidget {
   final ImageUiModel image;
+  final Function(ImageUiModel) onFavoriteToggled;
 
-  const _ImageItem({required this.image});
+  const _ImageItem({required this.image, required this.onFavoriteToggled});
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: Image.network(
-        image.imageThumbnail,
-        fit: BoxFit.cover,
-        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-          if (loadingProgress == null) {
-            return child;
-          }
-          return Stack(
-            fit: StackFit.expand,
-            children: [
-              Container(color: Colors.black12),
-              const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))),
-            ],
-          );
-        },
-        errorBuilder:
-            (BuildContext context, Object error, StackTrace? stackTrace) => Container(
-              color: Colors.black12,
-              alignment: Alignment.center,
-              child: const Icon(Icons.broken_image, size: 24),
+    return InkWell(
+      onDoubleTap: () => onFavoriteToggled(image),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.network(
+              image.imageThumbnail,
+              fit: BoxFit.cover,
+              loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                if (loadingProgress == null) {
+                  return child;
+                }
+                return Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Container(color: Colors.black12),
+                    const Center(
+                      child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+                    ),
+                  ],
+                );
+              },
+              errorBuilder:
+                  (BuildContext context, Object error, StackTrace? stackTrace) => Container(
+                    color: Colors.black12,
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.broken_image, size: 24),
+                  ),
+              gaplessPlayback: true,
             ),
-        gaplessPlayback: true,
+            Positioned(
+              top: 16,
+              right: 16,
+              child: InkWell(
+                onTap: () => onFavoriteToggled(image),
+                child:
+                    (image.isFavorite)
+                        ? Icon(Icons.bookmark, color: Colors.red)
+                        : Icon(Icons.bookmark_add_outlined, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

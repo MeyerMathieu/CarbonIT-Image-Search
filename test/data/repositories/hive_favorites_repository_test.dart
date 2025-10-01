@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:carbon_it_images_search/data/repositories/hive_favorites_repository.dart';
 import 'package:carbon_it_images_search/domain/favorites_repository_result.dart';
 import 'package:carbon_it_images_search/presentation/models/image_ui_model.dart';
@@ -94,7 +96,7 @@ void main() {
       final HiveFavoritesRepository repository = HiveFavoritesRepository(favoritesBox: box);
 
       // When
-      final FavoritesRepositoryResult result = await repository.removeImageFromFavorites(imageId: 1);
+      final FavoritesRepositoryResult result = await repository.removeImageFromFavorites(imageId: '1');
 
       // Then
       expect(box.values.length, 1);
@@ -108,7 +110,7 @@ void main() {
       when(box.delete('1')).thenThrow('Error');
 
       // When
-      final FavoritesRepositoryResult result = await repository.removeImageFromFavorites(imageId: 1);
+      final FavoritesRepositoryResult result = await repository.removeImageFromFavorites(imageId: '1');
 
       // Then
       expect(result, isA<FavoritesRepositoryErrorResult>());
@@ -167,6 +169,58 @@ void main() {
 
       // Then
       expect(result, [imageEntity1, imageEntity2]);
+    });
+  });
+
+  group('watchFavoritesIds', () {
+    setUp(() async {
+      await setUpTestHive();
+    });
+
+    tearDown(() async {
+      await tearDownTestHive();
+    });
+
+    test('When subscribing to favoritesIds, should emit already saved ids', () async {
+      // Given
+      final Box<Map<String, dynamic>> favoritesBox = await Hive.openBox<Map<String, dynamic>>('favorites_v1');
+      await favoritesBox.put('1', <String, dynamic>{});
+      await favoritesBox.put('2', <String, dynamic>{});
+      final HiveFavoritesRepository favoritesRepository = HiveFavoritesRepository(favoritesBox: favoritesBox);
+
+      // When
+      final Set<String> firstEmission = await favoritesRepository.watchFavoritesIds().first;
+
+      // Then
+      expect(firstEmission, {'1', '2'});
+    });
+
+    test('When hive box is modified, watchFavoritesIds should emit each modification', () async {
+      // Given
+      final Box<Map<String, dynamic>> favoritesBox = await Hive.openBox<Map<String, dynamic>>('favorites_v1');
+      await favoritesBox.clear();
+      final HiveFavoritesRepository favoritesRepository = HiveFavoritesRepository(favoritesBox: favoritesBox);
+      final StreamIterator<Set<String>> streamIterator = StreamIterator<Set<String>>(
+        favoritesRepository.watchFavoritesIds(),
+      );
+
+      // When / Then
+      expect(await streamIterator.moveNext(), true);
+      expect(streamIterator.current, <String>{});
+
+      await favoritesBox.put('1', <String, dynamic>{});
+      expect(await streamIterator.moveNext(), true);
+      expect(streamIterator.current, <String>{'1'});
+
+      await favoritesBox.put('2', <String, dynamic>{});
+      expect(await streamIterator.moveNext(), true);
+      expect(streamIterator.current, <String>{'1', '2'});
+
+      await favoritesBox.delete('1');
+      expect(await streamIterator.moveNext(), true);
+      expect(streamIterator.current, <String>{'2'});
+
+      await streamIterator.cancel();
     });
   });
 }

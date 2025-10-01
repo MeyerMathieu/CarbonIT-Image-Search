@@ -6,11 +6,16 @@
 import 'dart:async' as _i3;
 
 import 'package:carbon_it_images_search/data/entities/image_entity.dart' as _i4;
+import 'package:carbon_it_images_search/domain/favorites_repository_result.dart'
+    as _i6;
 import 'package:carbon_it_images_search/domain/repositories/favorites_repository.dart'
     as _i5;
 import 'package:carbon_it_images_search/domain/repositories/images_search_repository.dart'
     as _i2;
+import 'package:carbon_it_images_search/presentation/models/image_ui_model.dart'
+    as _i7;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:mockito/src/dummies.dart' as _i8;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -58,39 +63,80 @@ class MockImagesSearchRepository extends _i1.Mock
 class MockFavoritesRepository extends _i1.Mock
     implements _i5.FavoritesRepository {
   @override
-  _i3.Future<void> saveImageToFavorites({
-    required _i4.ImageEntity? imageEntity,
+  _i3.Future<_i6.FavoritesRepositoryResult> saveImageToFavorites({
+    required _i7.ImageUiModel? imageUiModel,
   }) =>
       (super.noSuchMethod(
             Invocation.method(#saveImageToFavorites, [], {
-              #imageEntity: imageEntity,
+              #imageUiModel: imageUiModel,
             }),
-            returnValue: _i3.Future<void>.value(),
-            returnValueForMissingStub: _i3.Future<void>.value(),
+            returnValue: _i3.Future<_i6.FavoritesRepositoryResult>.value(
+              _i8.dummyValue<_i6.FavoritesRepositoryResult>(
+                this,
+                Invocation.method(#saveImageToFavorites, [], {
+                  #imageUiModel: imageUiModel,
+                }),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i3.Future<_i6.FavoritesRepositoryResult>.value(
+                  _i8.dummyValue<_i6.FavoritesRepositoryResult>(
+                    this,
+                    Invocation.method(#saveImageToFavorites, [], {
+                      #imageUiModel: imageUiModel,
+                    }),
+                  ),
+                ),
           )
-          as _i3.Future<void>);
+          as _i3.Future<_i6.FavoritesRepositoryResult>);
 
   @override
-  _i3.Future<void> removeImageFromFavorites({required int? imageId}) =>
+  _i3.Future<_i6.FavoritesRepositoryResult> removeImageFromFavorites({
+    required String? imageId,
+  }) =>
       (super.noSuchMethod(
             Invocation.method(#removeImageFromFavorites, [], {
               #imageId: imageId,
             }),
-            returnValue: _i3.Future<void>.value(),
-            returnValueForMissingStub: _i3.Future<void>.value(),
+            returnValue: _i3.Future<_i6.FavoritesRepositoryResult>.value(
+              _i8.dummyValue<_i6.FavoritesRepositoryResult>(
+                this,
+                Invocation.method(#removeImageFromFavorites, [], {
+                  #imageId: imageId,
+                }),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i3.Future<_i6.FavoritesRepositoryResult>.value(
+                  _i8.dummyValue<_i6.FavoritesRepositoryResult>(
+                    this,
+                    Invocation.method(#removeImageFromFavorites, [], {
+                      #imageId: imageId,
+                    }),
+                  ),
+                ),
           )
-          as _i3.Future<void>);
+          as _i3.Future<_i6.FavoritesRepositoryResult>);
 
   @override
-  _i3.Future<List<_i4.ImageEntity>> getFavorites() =>
+  _i3.Future<List<_i7.ImageUiModel>> getFavorites() =>
       (super.noSuchMethod(
             Invocation.method(#getFavorites, []),
-            returnValue: _i3.Future<List<_i4.ImageEntity>>.value(
-              <_i4.ImageEntity>[],
+            returnValue: _i3.Future<List<_i7.ImageUiModel>>.value(
+              <_i7.ImageUiModel>[],
             ),
-            returnValueForMissingStub: _i3.Future<List<_i4.ImageEntity>>.value(
-              <_i4.ImageEntity>[],
+            returnValueForMissingStub: _i3.Future<List<_i7.ImageUiModel>>.value(
+              <_i7.ImageUiModel>[],
             ),
           )
-          as _i3.Future<List<_i4.ImageEntity>>);
+          as _i3.Future<List<_i7.ImageUiModel>>);
+
+  @override
+  _i3.Stream<Set<String>> watchFavoritesIds() =>
+      (super.noSuchMethod(
+            Invocation.method(#watchFavoritesIds, []),
+            returnValue: _i3.Stream<Set<String>>.empty(),
+            returnValueForMissingStub: _i3.Stream<Set<String>>.empty(),
+          )
+          as _i3.Stream<Set<String>>);
 }

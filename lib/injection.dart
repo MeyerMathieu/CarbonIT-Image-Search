@@ -15,7 +15,7 @@ final getItInstance = GetIt.instance;
 Future<void> setupInjection() async {
   // Hive
   await Hive.initFlutter();
-  final favoritesBox = await Hive.openBox<Map>(HiveFavoritesRepository.favoritesBoxName);
+  final favoritesBox = await Hive.openBox<Map<String, dynamic>>(HiveFavoritesRepository.favoritesBoxName);
 
   // Repositories
   getItInstance.registerLazySingleton<ImagesSearchRepository>(

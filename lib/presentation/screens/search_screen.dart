@@ -72,7 +72,7 @@ class _SearchBar extends StatelessWidget {
               onSubmitted: (newValue) {
                 _performSearch(context);
               },
-              enabled: !searchScreenViewModel.state.isLoading,
+              enabled: searchScreenViewModel.state is! SearchStateLoading,
               decoration: InputDecoration(
                 hintText: 'Search images',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -83,7 +83,7 @@ class _SearchBar extends StatelessWidget {
                   child: IconButton(
                     tooltip: 'Search',
                     icon:
-                        (searchScreenViewModel.state.isLoading)
+                        (searchScreenViewModel.state is SearchStateLoading)
                             ? Transform.scale(scale: 0.5, child: CircularProgressIndicator())
                             : Icon(Icons.search),
                     onPressed: () => _performSearch(context),
@@ -96,6 +96,7 @@ class _SearchBar extends StatelessWidget {
   }
 
   void _performSearch(BuildContext context) {
+    // TODO : Handle empty field
     final textFieldContent = searchTextEditingController.text.trim();
     onSearchSubmitted(textFieldContent);
     _hideKeyboard(context);
@@ -112,35 +113,29 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO : Convert to switch
-    if (state.isLoading) {
-      return _LoadingState();
-    } else if (state.errorMessage != null) {
-      return _ErrorState(message: state.errorMessage!);
-    } else if (state.lastQuery != null && state.imagesItems.isEmpty) {
-      return _NoImagesFoundState(searchQuery: state.lastQuery!);
-    } else if (state.imagesItems.isEmpty) {
-      return _EmptyState();
-    } else {
-      return _ImagesList(images: state.imagesItems, onFavoriteToggled: onFavoriteToggled);
-    }
+    return switch (state) {
+      SearchStateLoading _ => _LoadingState(),
+      SearchStateSuccess successState => _SuccessState(
+        images: successState.imagesItems,
+        onFavoriteToggled: onFavoriteToggled,
+      ),
+      SearchStateEmpty emptyState => _EmptyState(searchQuery: emptyState.lastQuery),
+      SearchStateError errorState => _ErrorState(message: errorState.errorMessage),
+    };
   }
 }
 
-class _ImagesList extends StatelessWidget {
+class _SuccessState extends StatelessWidget {
   static const double _paddingBetweenItems = 4;
   static const int _itemsPerLine = 2;
 
   final List<ImageUiModel> images;
   final Function(ImageUiModel) onFavoriteToggled;
 
-  const _ImagesList({required this.images, required this.onFavoriteToggled});
+  const _SuccessState({required this.images, required this.onFavoriteToggled});
 
   @override
   Widget build(BuildContext context) {
-    if (images.isEmpty) {
-      return _EmptyState();
-    }
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: _itemsPerLine,
@@ -214,28 +209,19 @@ class _ImageItem extends StatelessWidget {
 }
 
 class _EmptyState extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [Text('No item to display.'), Text('Make a search to display images !')],
-      ),
-    );
-  }
-}
+  final String? searchQuery;
 
-class _NoImagesFoundState extends StatelessWidget {
-  final String searchQuery;
-
-  const _NoImagesFoundState({required this.searchQuery});
+  const _EmptyState({required this.searchQuery});
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [Text('No item found for "$searchQuery"'), Text('Try a new search !')],
+        children:
+            (searchQuery != null)
+                ? [Text('No item found for "$searchQuery"'), Text('Try a new search !')]
+                : [Text('No item to display.'), Text('Make a search to display images !')],
       ),
     );
   }

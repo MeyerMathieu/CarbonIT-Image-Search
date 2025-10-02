@@ -12,7 +12,7 @@ import 'package:flutter/foundation.dart';
 class SearchScreenViewModel extends ChangeNotifier {
   final ImagesSearchRepository imagesSearchRepository;
   final FavoritesRepository favoritesRepository;
-  SearchState state = const SearchState.idle();
+  SearchState state = SearchStateEmpty();
   Set<String> _favoritesIds = {};
   StreamSubscription<Set<String>>? _favoritesIdsStreamSubscription;
 
@@ -24,7 +24,7 @@ class SearchScreenViewModel extends ChangeNotifier {
   }
 
   Future<void> submitSearch({required String searchValue}) async {
-    state = state.copyWith(isLoading: true, imagesItems: [], errorMessage: null, lastQuery: searchValue);
+    state = SearchStateLoading();
     notifyListeners();
     try {
       final List<ImageEntity> repositoryResults = await imagesSearchRepository.searchImages(search: searchValue);
@@ -34,22 +34,18 @@ class SearchScreenViewModel extends ChangeNotifier {
                 (ImageEntity imageEntity) => ImageUiModelMapper.mapImageEntityToImageUiModel(imageEntity: imageEntity),
               )
               .toList();
-      state = state.copyWith(
-        isLoading: false,
-        imagesItems: imagesToDisplay,
-        errorMessage: null,
-        lastQuery: searchValue,
-      );
+      state =
+          (imagesToDisplay.isEmpty) ? SearchStateEmpty(lastQuery: searchValue) : SearchStateSuccess(imagesToDisplay);
       notifyListeners();
     } catch (error) {
-      state = state.copyWith(isLoading: false, imagesItems: [], errorMessage: error.toString(), lastQuery: searchValue);
+      state = SearchStateError(error.toString());
       notifyListeners();
     }
   }
 
   Future<void> toggleItemFavorite({required ImageUiModel imageUiModel}) async {
     _favoritesIds.contains(imageUiModel.id)
-        ? _removeItemFromFavorite(imageUiModel: imageUiModel)
+        ? _removeItemFromFavorite(imageToRemove: imageUiModel)
         : _addItemToFavorite(imageToAdd: imageUiModel);
   }
 
@@ -57,22 +53,30 @@ class SearchScreenViewModel extends ChangeNotifier {
     final repositoryResponse = await favoritesRepository.saveImageToFavorites(
       imageUiModel: imageToAdd.copyWith(isFavorite: true),
     );
-    if (repositoryResponse is FavoritesRepositorySuccessResult) {
-      final int imageItemIndex = state.imagesItems.indexWhere(
+    if (repositoryResponse is FavoritesRepositorySuccessResult && state is SearchStateSuccess) {
+      // TODO : Arrange cast
+      final updatedList = (state as SearchStateSuccess).imagesItems;
+      final int imageItemIndex = updatedList.indexWhere(
         (ImageUiModel imageUiModel) => imageUiModel.id == imageToAdd.id,
       );
-      state.imagesItems[imageItemIndex] = state.imagesItems[imageItemIndex].copyWith(isFavorite: true);
+      updatedList[imageItemIndex] = updatedList[imageItemIndex].copyWith(isFavorite: true);
+      state = SearchStateSuccess(updatedList);
       notifyListeners();
     } else {
       // TODO : Display error snackbar ?
     }
   }
 
-  Future<void> _removeItemFromFavorite({required ImageUiModel imageUiModel}) async {
-    final repositoryResponse = await favoritesRepository.removeImageFromFavorites(imageId: imageUiModel.id);
+  Future<void> _removeItemFromFavorite({required ImageUiModel imageToRemove}) async {
+    final repositoryResponse = await favoritesRepository.removeImageFromFavorites(imageId: imageToRemove.id);
     if (repositoryResponse is FavoritesRepositorySuccessResult) {
-      final int imageItemIndex = state.imagesItems.indexOf(imageUiModel);
-      state.imagesItems[imageItemIndex] = state.imagesItems[imageItemIndex].copyWith(isFavorite: false);
+      // TODO : Arrange cast
+      final int imageItemIndex = (state as SearchStateSuccess).imagesItems.indexWhere(
+        (ImageUiModel imageUiModel) => imageUiModel.id == imageToRemove.id,
+      );
+      final updatedList = (state as SearchStateSuccess).imagesItems;
+      updatedList[imageItemIndex] = updatedList[imageItemIndex].copyWith(isFavorite: false);
+      state = SearchStateSuccess(updatedList);
       notifyListeners();
     } else {
       // TODO : Display error snackbar ?
@@ -80,16 +84,16 @@ class SearchScreenViewModel extends ChangeNotifier {
   }
 
   void _refreshFavoritesOnCurrentList() {
-    if (state.imagesItems.isEmpty) {
+    if ((state as SearchStateSuccess).imagesItems.isEmpty) {
       return;
     }
     final updatedImages =
-        state.imagesItems
+        (state as SearchStateSuccess).imagesItems
             .map(
               (ImageUiModel imageUiModel) => imageUiModel.copyWith(isFavorite: _favoritesIds.contains(imageUiModel.id)),
             )
             .toList();
-    state = state.copyWith(imagesItems: updatedImages);
+    state = SearchStateSuccess(updatedImages);
     notifyListeners();
   }
 

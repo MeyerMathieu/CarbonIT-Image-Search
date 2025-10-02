@@ -67,10 +67,9 @@ void main() {
       await viewModel.submitSearch(searchValue: searchValue);
 
       // Then
-      expect(viewModel.state.isLoading, false);
-      expect(viewModel.state.errorMessage, null);
-      expect(viewModel.state.imagesItems.length, 2);
-      expect(viewModel.state.imagesItems, resultImagesItems);
+      expect(viewModel.state, isA<SearchStateSuccess>());
+      expect((viewModel.state as SearchStateSuccess).imagesItems.length, 2);
+      expect((viewModel.state as SearchStateSuccess).imagesItems, resultImagesItems);
     });
 
     test('When a search is submitted, should set state to loading', () {
@@ -78,10 +77,7 @@ void main() {
       viewModel.submitSearch(searchValue: searchValue);
 
       // Then
-      expect(viewModel.state.isLoading, true);
-      expect(viewModel.state.lastQuery, searchValue);
-      expect(viewModel.state.errorMessage, null);
-      expect(viewModel.state.imagesItems.length, 0);
+      expect(viewModel.state, isA<SearchStateLoading>());
     });
 
     test('When the repository throws an error, should set state to error', () {
@@ -93,10 +89,7 @@ void main() {
       viewModel.submitSearch(searchValue: searchValue);
 
       // Then
-      expect(viewModel.state.isLoading, false);
-      expect(viewModel.state.lastQuery, searchValue);
-      expect(viewModel.state.errorMessage, repositoryErrorMessage);
-      expect(viewModel.state.imagesItems.length, 0);
+      expect(viewModel.state, isA<SearchStateError>());
     });
   });
 
@@ -123,7 +116,7 @@ void main() {
         largeImage: 'largeImage',
         isFavorite: false,
       );
-      viewModel.state = SearchState.success([imageToAddToFavorites]);
+      viewModel.state = SearchStateSuccess([imageToAddToFavorites]);
       when(
         favoritesRepository.saveImageToFavorites(imageUiModel: imageToAddToFavorites.copyWith(isFavorite: true)),
       ).thenAnswer((_) async => FavoritesRepositorySuccessResult());
@@ -132,40 +125,56 @@ void main() {
       await viewModel.toggleItemFavorite(imageUiModel: imageToAddToFavorites);
 
       // Then
-      expect(viewModel.state.imagesItems.first.isFavorite, true);
+      expect(viewModel.state, isA<SearchStateSuccess>());
+      expect((viewModel.state as SearchStateSuccess).imagesItems.first.isFavorite, true);
     });
 
     test('When the item is already in favorites, should remove it from repository', () async {
       // Given
-      final ImageUiModel imageToRemoveFromFavorites = ImageUiModel(
-        id: '1',
-        width: 1024,
-        height: 1024,
-        alt: 'alt',
-        imageThumbnail: 'imageThumbnail',
-        originalImage: 'originalImage',
-        largeImage: 'largeImage',
-        isFavorite: true,
-      );
+      final List<ImageUiModel> searchItems = [
+        ImageUiModel(
+          id: '1',
+          width: 1024,
+          height: 1024,
+          alt: 'alt',
+          imageThumbnail: 'imageThumbnail',
+          originalImage: 'originalImage',
+          largeImage: 'largeImage',
+          isFavorite: true,
+        ),
+        ImageUiModel(
+          id: '2',
+          width: 1024,
+          height: 1024,
+          alt: 'alt',
+          imageThumbnail: 'imageThumbnail',
+          originalImage: 'originalImage',
+          largeImage: 'largeImage',
+          isFavorite: false,
+        ),
+      ];
       final favoritesRepository = MockFavoritesRepository();
-      when(favoritesRepository.watchFavoritesIds()).thenAnswer((_) => Stream<Set<String>>.value({'1'}));
-      when(
-        favoritesRepository.removeImageFromFavorites(imageId: imageToRemoveFromFavorites.id),
-      ).thenAnswer((_) async => FavoritesRepositorySuccessResult());
-
       final imagesSearchRepository = MockImagesSearchRepository();
+
+      final controller = StreamController<Set<String>>();
+      when(favoritesRepository.watchFavoritesIds()).thenAnswer((_) => controller.stream);
+      when(
+        favoritesRepository.removeImageFromFavorites(imageId: searchItems.first.id),
+      ).thenAnswer((_) async => FavoritesRepositorySuccessResult());
       final SearchScreenViewModel viewModel = SearchScreenViewModel(
         imagesSearchRepository: imagesSearchRepository,
         favoritesRepository: favoritesRepository,
       );
+      viewModel.state = SearchStateSuccess(searchItems);
+      controller.add(<String>{'1'});
       await Future<void>.delayed(Duration.zero);
-      viewModel.state = SearchState.success([imageToRemoveFromFavorites]);
 
       // When
-      await viewModel.toggleItemFavorite(imageUiModel: imageToRemoveFromFavorites);
+      await viewModel.toggleItemFavorite(imageUiModel: searchItems.first);
 
       // Then
-      expect(viewModel.state.imagesItems.first.isFavorite, false);
+      expect(viewModel.state, isA<SearchStateSuccess>());
+      expect((viewModel.state as SearchStateSuccess).imagesItems.first.isFavorite, false);
     });
   });
 
@@ -180,7 +189,7 @@ void main() {
         imagesSearchRepository: imagesSearchRepository,
         favoritesRepository: favoritesRepository,
       );
-      viewModel.state = SearchState.success([
+      viewModel.state = SearchStateSuccess([
         ImageUiModel(
           id: '1',
           width: 1024,
@@ -208,7 +217,8 @@ void main() {
       await Future.delayed(Duration.zero);
 
       // Then
-      expect(viewModel.state.imagesItems.first.isFavorite, false);
+      expect(viewModel.state, isA<SearchStateSuccess>());
+      expect((viewModel.state as SearchStateSuccess).imagesItems.first.isFavorite, false);
     });
   });
 }

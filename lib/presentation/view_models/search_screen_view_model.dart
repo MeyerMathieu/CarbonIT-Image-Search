@@ -13,6 +13,11 @@ class SearchScreenViewModel extends ChangeNotifier {
   final ImagesSearchRepository imagesSearchRepository;
   final FavoritesRepository favoritesRepository;
   SearchState state = SearchStateEmpty();
+  bool isLoadingMore = false;
+
+  String? _currentQuery;
+  int _currentPage = 1;
+  bool _hasMoreItems = true;
   Set<String> _favoritesIds = {};
   StreamSubscription<Set<String>>? _favoritesIdsStreamSubscription;
 
@@ -24,23 +29,57 @@ class SearchScreenViewModel extends ChangeNotifier {
   }
 
   Future<void> submitSearch({required String searchValue}) async {
+    _currentPage = 1;
+    _currentQuery = searchValue;
     state = SearchStateLoading();
     notifyListeners();
     try {
-      final List<ImageEntity> repositoryResults = await imagesSearchRepository.searchImages(search: searchValue);
-      final List<ImageUiModel> imagesToDisplay =
-          repositoryResults
-              .map(
-                (ImageEntity imageEntity) => ImageUiModelMapper.mapImageEntityToImageUiModel(imageEntity: imageEntity),
-              )
-              .toList();
-      state =
-          (imagesToDisplay.isEmpty) ? SearchStateEmpty(lastQuery: searchValue) : SearchStateSuccess(imagesToDisplay);
-      notifyListeners();
-    } catch (error) {
-      state = SearchStateError(error.toString());
+      final List<ImageUiModel> imagesToDisplay = await _performSearch();
+      if (imagesToDisplay.isEmpty) {
+        _hasMoreItems = false;
+        state = SearchStateEmpty(lastQuery: searchValue);
+      } else {
+        state = SearchStateSuccess(imagesToDisplay);
+      }
+    } catch (exception) {
+      state = SearchStateError(exception.toString());
+    } finally {
+      isLoadingMore = false;
       notifyListeners();
     }
+  }
+
+  Future<void> loadMoreItems() async {
+    if (_currentQuery == null || !_hasMoreItems) {
+      return;
+    }
+    isLoadingMore = true;
+    notifyListeners();
+    final List<ImageUiModel> currentItems = (state as SearchStateSuccess).imagesItems;
+    _currentPage++;
+    try {
+      final List<ImageUiModel> imagesToDisplay = await _performSearch();
+      if (imagesToDisplay.isEmpty) {
+        _hasMoreItems = false;
+      } else {
+        state = SearchStateSuccess(currentItems..addAll(imagesToDisplay));
+      }
+    } catch (exception) {
+      // TODO : Log ?
+    } finally {
+      isLoadingMore = false;
+      notifyListeners();
+    }
+  }
+
+  Future<List<ImageUiModel>> _performSearch() async {
+    final List<ImageEntity> repositoryResults = await imagesSearchRepository.searchImages(
+      search: _currentQuery!,
+      page: _currentPage,
+    );
+    return repositoryResults
+        .map((ImageEntity imageEntity) => ImageUiModelMapper.mapImageEntityToImageUiModel(imageEntity: imageEntity))
+        .toList();
   }
 
   Future<void> toggleItemFavorite({required ImageUiModel imageUiModel}) async {

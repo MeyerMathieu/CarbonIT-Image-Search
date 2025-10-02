@@ -80,17 +80,129 @@ void main() {
       expect(viewModel.state, isA<SearchStateLoading>());
     });
 
-    test('When the repository throws an error, should set state to error', () {
+    test('When the repository throws an error, should set state to error', () async {
       // Given
       final String repositoryErrorMessage = 'Error';
       when(imagesSearchRepository.searchImages(search: searchValue)).thenThrow(repositoryErrorMessage);
 
       // When
-      viewModel.submitSearch(searchValue: searchValue);
+      await viewModel.submitSearch(searchValue: searchValue);
 
       // Then
       expect(viewModel.state, isA<SearchStateError>());
     });
+  });
+
+  group('loadMoreItems', () {
+    final ImagesSearchRepository imagesSearchRepository = MockImagesSearchRepository();
+    final FavoritesRepository favoritesRepository = MockFavoritesRepository();
+    final SearchScreenViewModel viewModel = SearchScreenViewModel(
+      imagesSearchRepository: imagesSearchRepository,
+      favoritesRepository: favoritesRepository,
+    );
+    final String searchValue = 'searchValue';
+
+    test('When loading more items, if current query is null, should do nothing', () {});
+
+    test('When loading more items, if hasMoreItems is false, should do nothing', () {});
+    test(
+      'When loading more items, if repository returns successfully, should add new items to SearchSuccessState list',
+      () async {
+        // Given
+        final ImageSourceEntity imageSourceEntity = ImageSourceEntity(
+          original: 'original',
+          large: 'large',
+          medium: 'medium',
+          small: 'small',
+          portrait: 'portrait',
+          landscape: 'landscape',
+          tiny: 'tiny',
+        );
+        final List<ImageEntity> originalRequestSuccessResult = [
+          ImageEntity(id: 'id1', width: 1024, height: 1024, source: imageSourceEntity),
+          ImageEntity(id: 'id2', width: 1024, height: 1024, source: imageSourceEntity),
+        ];
+        final List<ImageEntity> repositorySuccessResult = [
+          ImageEntity(id: 'id3', width: 1024, height: 1024, source: imageSourceEntity),
+          ImageEntity(id: 'id4', width: 1024, height: 1024, source: imageSourceEntity),
+        ];
+        final List<ImageUiModel> originalList = [
+          ImageUiModel(
+            id: 'id1',
+            width: 1024,
+            height: 1024,
+            imageThumbnail: 'tiny',
+            originalImage: 'original',
+            largeImage: 'large',
+            isFavorite: false,
+          ),
+          ImageUiModel(
+            id: 'id2',
+            width: 1024,
+            height: 1024,
+            imageThumbnail: 'tiny',
+            originalImage: 'original',
+            largeImage: 'large',
+            isFavorite: false,
+          ),
+        ];
+        final List<ImageUiModel> resultImagesItems = [
+          ImageUiModel(
+            id: 'id1',
+            width: 1024,
+            height: 1024,
+            imageThumbnail: 'tiny',
+            originalImage: 'original',
+            largeImage: 'large',
+            isFavorite: false,
+          ),
+          ImageUiModel(
+            id: 'id2',
+            width: 1024,
+            height: 1024,
+            imageThumbnail: 'tiny',
+            originalImage: 'original',
+            largeImage: 'large',
+            isFavorite: false,
+          ),
+          ImageUiModel(
+            id: 'id3',
+            width: 1024,
+            height: 1024,
+            imageThumbnail: 'tiny',
+            originalImage: 'original',
+            largeImage: 'large',
+            isFavorite: false,
+          ),
+          ImageUiModel(
+            id: 'id4',
+            width: 1024,
+            height: 1024,
+            imageThumbnail: 'tiny',
+            originalImage: 'original',
+            largeImage: 'large',
+            isFavorite: false,
+          ),
+        ];
+        when(
+          imagesSearchRepository.searchImages(search: searchValue, page: 1),
+        ).thenAnswer((_) async => originalRequestSuccessResult);
+        when(
+          imagesSearchRepository.searchImages(search: searchValue, page: 2),
+        ).thenAnswer((_) async => repositorySuccessResult);
+        await viewModel.submitSearch(searchValue: searchValue);
+
+        // When
+        await viewModel.loadMoreItems();
+
+        // Then
+        expect(viewModel.state, isA<SearchStateSuccess>());
+        expect((viewModel.state as SearchStateSuccess).imagesItems.length, 4);
+        expect((viewModel.state as SearchStateSuccess).imagesItems, resultImagesItems);
+      },
+    );
+    test('When loading more items, if repository returns successfully with empty list, should do nothing', () {});
+    test('When loading more items, if repository returns a failure, should do nothing', () {});
   });
 
   group('toggleItemFavorite', () {

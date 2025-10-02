@@ -12,8 +12,17 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  static const _minPixelsBeforeLoadMoreItems = 500;
+
   final SearchScreenViewModel _searchScreenViewModel = getItInstance<SearchScreenViewModel>();
   final TextEditingController _searchTextEditingController = TextEditingController();
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController()..addListener(_onScroll);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +41,8 @@ class _SearchScreenState extends State<SearchScreen> {
             builder:
                 (BuildContext context, _) => _Body(
                   state: _searchScreenViewModel.state,
+                  isLoadingMore: _searchScreenViewModel.isLoadingMore,
+                  scrollController: _scrollController,
                   onFavoriteToggled: (ImageUiModel imageUiModel) {
                     _searchScreenViewModel.toggleItemFavorite(imageUiModel: imageUiModel);
                   },
@@ -45,7 +56,15 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void dispose() {
     _searchTextEditingController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.extentAfter < _minPixelsBeforeLoadMoreItems &&
+        !_searchScreenViewModel.isLoadingMore) {
+      _searchScreenViewModel.loadMoreItems();
+    }
   }
 }
 
@@ -107,9 +126,16 @@ class _SearchBar extends StatelessWidget {
 
 class _Body extends StatelessWidget {
   final SearchState state;
+  final bool isLoadingMore;
+  final ScrollController scrollController;
   final Function(ImageUiModel) onFavoriteToggled;
 
-  const _Body({required this.state, required this.onFavoriteToggled});
+  const _Body({
+    required this.state,
+    required this.isLoadingMore,
+    required this.scrollController,
+    required this.onFavoriteToggled,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -117,6 +143,8 @@ class _Body extends StatelessWidget {
       SearchStateLoading _ => _LoadingState(),
       SearchStateSuccess successState => _SuccessState(
         images: successState.imagesItems,
+        isLoadingMore: isLoadingMore,
+        scrollController: scrollController,
         onFavoriteToggled: onFavoriteToggled,
       ),
       SearchStateEmpty emptyState => _EmptyState(searchQuery: emptyState.lastQuery),
@@ -126,28 +154,50 @@ class _Body extends StatelessWidget {
 }
 
 class _SuccessState extends StatelessWidget {
+  static const double _bottomPadding = 24;
   static const double _paddingBetweenItems = 4;
   static const int _itemsPerLine = 2;
 
   final List<ImageUiModel> images;
+  final bool isLoadingMore;
+  final ScrollController scrollController;
   final Function(ImageUiModel) onFavoriteToggled;
 
-  const _SuccessState({required this.images, required this.onFavoriteToggled});
+  const _SuccessState({
+    required this.images,
+    required this.isLoadingMore,
+    required this.scrollController,
+    required this.onFavoriteToggled,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: _itemsPerLine,
-        crossAxisSpacing: _paddingBetweenItems,
-        mainAxisSpacing: _paddingBetweenItems,
-      ),
-      itemCount: images.length,
-      itemBuilder:
-          (BuildContext context, index) => _ImageItem(image: images[index], onFavoriteToggled: onFavoriteToggled),
-      padding: EdgeInsets.all(_paddingBetweenItems),
+    return Column(
+      children: [
+        Expanded(
+          child: GridView.builder(
+            controller: scrollController,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: _itemsPerLine,
+              crossAxisSpacing: _paddingBetweenItems,
+              mainAxisSpacing: _paddingBetweenItems,
+            ),
+            itemCount: images.length,
+            itemBuilder:
+                (BuildContext context, index) => _ImageItem(image: images[index], onFavoriteToggled: onFavoriteToggled),
+            padding: EdgeInsets.only(bottom: _bottomPadding, left: _paddingBetweenItems, right: _paddingBetweenItems),
+          ),
+        ),
+        if (isLoadingMore) ...[_LoadingMoreItem()],
+      ],
     );
   }
+}
+
+class _LoadingMoreItem extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) =>
+      Container(color: Colors.transparent, child: Center(child: CircularProgressIndicator()));
 }
 
 class _ImageItem extends StatelessWidget {

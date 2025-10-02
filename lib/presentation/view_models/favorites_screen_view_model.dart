@@ -1,3 +1,4 @@
+import 'package:carbon_it_images_search/domain/favorites_repository_result.dart';
 import 'package:carbon_it_images_search/domain/repositories/favorites_repository.dart';
 import 'package:carbon_it_images_search/presentation/models/image_ui_model.dart';
 import 'package:carbon_it_images_search/presentation/states/favorites_states.dart';
@@ -6,7 +7,7 @@ import 'package:flutter/foundation.dart';
 class FavoritesScreenViewModel extends ChangeNotifier {
   final FavoritesRepository favoritesRepository;
 
-  FavoritesState state = FavoritesStateIdle();
+  FavoritesState state = FavoritesStateEmpty();
 
   FavoritesScreenViewModel({required this.favoritesRepository});
 
@@ -23,7 +24,17 @@ class FavoritesScreenViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> removeImageFromFavorites() async {
-    // TODO
+  Future<void> removeImageFromFavorites({required ImageUiModel imageUiModel}) async {
+    final repositoryResponse = await favoritesRepository.removeImageFromFavorites(imageId: imageUiModel.id);
+    if (repositoryResponse is FavoritesRepositorySuccessResult && state is FavoritesStateSuccess) {
+      final List<ImageUiModel> newFavoritesList =
+          (state as FavoritesStateSuccess).imagesItems
+              .where((ImageUiModel imageItem) => imageItem.id != imageUiModel.id)
+              .toList();
+      state = (newFavoritesList.isEmpty) ? FavoritesStateEmpty() : FavoritesStateSuccess(newFavoritesList);
+      notifyListeners();
+    } else {
+      // TODO : Display error snackbar ?
+    }
   }
 }

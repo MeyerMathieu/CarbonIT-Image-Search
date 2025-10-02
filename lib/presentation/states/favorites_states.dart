@@ -4,8 +4,6 @@ sealed class FavoritesState {
   const FavoritesState();
 }
 
-final class FavoritesStateIdle extends FavoritesState {}
-
 final class FavoritesStateLoading extends FavoritesState {}
 
 final class FavoritesStateSuccess extends FavoritesState {

@@ -47,6 +47,8 @@ void main() {
       when(
         box.put('9', {
           'id': '9',
+          'width': 1024,
+          'height': 1024,
           'alt': 'alt',
           'imageThumbnail': 'imageThumbnail',
           'originalImage': 'originalImage',
@@ -78,6 +80,8 @@ void main() {
       await box.putAll({
         '1': {
           'id': '1',
+          'width': 1024,
+          'height': 1024,
           'alt': 'alt',
           'imageThumbnail': 'imageThumbnail',
           'originalImage': 'originalImage',
@@ -86,6 +90,8 @@ void main() {
         },
         '2': {
           'id': '2',
+          'width': 1024,
+          'height': 1024,
           'alt': 'alt',
           'imageThumbnail': 'imageThumbnail',
           'originalImage': 'originalImage',
@@ -147,6 +153,8 @@ void main() {
       await box.putAll({
         '1': {
           'id': '1',
+          'width': 1024,
+          'height': 1024,
           'alt': 'alt',
           'imageThumbnail': 'imageThumbnail',
           'originalImage': 'originalImage',
@@ -155,6 +163,8 @@ void main() {
         },
         '2': {
           'id': '2',
+          'width': 1024,
+          'height': 1024,
           'alt': 'alt',
           'imageThumbnail': 'imageThumbnail',
           'originalImage': 'originalImage',
@@ -227,6 +237,8 @@ void main() {
 
 ImageUiModel createTestImageUiModel({required String id}) => ImageUiModel(
   id: id,
+  width: 1024,
+  height: 1024,
   alt: 'alt',
   imageThumbnail: 'imageThumbnail',
   originalImage: 'originalImage',

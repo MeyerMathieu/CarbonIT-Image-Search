@@ -2,14 +2,18 @@ import 'package:equatable/equatable.dart';
 
 class ImageUiModel extends Equatable {
   final String id;
+  final int width;
+  final int height;
   final String imageThumbnail;
   final String originalImage;
   final String largeImage;
   final bool isFavorite;
   final String? alt;
 
-  ImageUiModel({
+  const ImageUiModel({
     required this.id,
+    required this.width,
+    required this.height,
     required this.imageThumbnail,
     required this.originalImage,
     required this.largeImage,
@@ -19,6 +23,8 @@ class ImageUiModel extends Equatable {
 
   ImageUiModel copyWith({
     String? id,
+    int? width,
+    int? height,
     String? alt,
     String? imageThumbnail,
     String? originalImage,
@@ -26,6 +32,8 @@ class ImageUiModel extends Equatable {
     bool? isFavorite,
   }) => ImageUiModel(
     id: id ?? this.id,
+    width: width ?? this.width,
+    height: height ?? this.height,
     alt: alt ?? this.alt,
     imageThumbnail: imageThumbnail ?? this.imageThumbnail,
     originalImage: originalImage ?? this.originalImage,
@@ -34,5 +42,5 @@ class ImageUiModel extends Equatable {
   );
 
   @override
-  List<Object?> get props => [id, alt, imageThumbnail, originalImage, largeImage, isFavorite];
+  List<Object?> get props => [id, width, height, alt, imageThumbnail, originalImage, largeImage, isFavorite];
 }

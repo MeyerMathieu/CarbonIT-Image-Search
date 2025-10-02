@@ -21,7 +21,8 @@ void main() {
             'photos': [
               {
                 'id': 1,
-                'url': 'x',
+                'width': 1024,
+                'height': 1024,
                 'src': {
                   'original': 'original',
                   'large': 'large',

@@ -49,6 +49,8 @@ void main() {
         final List<ImageUiModel> expectedImageUiModelListOutput = [
           ImageUiModel(
             id: 'id1',
+            width: 1024,
+            height: 1024,
             imageThumbnail: 'imageThumbnail',
             originalImage: 'originalImage',
             largeImage: 'largeImage',
@@ -56,6 +58,8 @@ void main() {
           ),
           ImageUiModel(
             id: 'id2',
+            width: 1024,
+            height: 1024,
             imageThumbnail: 'imageThumbnail',
             originalImage: 'originalImage',
             largeImage: 'largeImage',

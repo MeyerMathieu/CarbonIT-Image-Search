@@ -8,6 +8,8 @@ void main() {
       // Given
       final ImageUiModel imageToSerialize = ImageUiModel(
         id: 'id',
+        width: 1024,
+        height: 1024,
         alt: 'alt',
         imageThumbnail: 'imageThumbnail',
         originalImage: 'originalImage',
@@ -16,6 +18,8 @@ void main() {
       );
       final Map<String, dynamic> expectedOutput = {
         'id': 'id',
+        'width': 1024,
+        'height': 1024,
         'alt': 'alt',
         'imageThumbnail': 'imageThumbnail',
         'originalImage': 'originalImage',
@@ -36,6 +40,8 @@ void main() {
       // Given
       final Map<String, dynamic> mapToDeserialize = {
         'id': 'id',
+        'width': 1024,
+        'height': 1024,
         'alt': 'alt',
         'imageThumbnail': 'imageThumbnail',
         'originalImage': 'originalImage',
@@ -44,6 +50,8 @@ void main() {
       };
       final ImageUiModel expectedImageEntityOutput = ImageUiModel(
         id: 'id',
+        width: 1024,
+        height: 1024,
         alt: 'alt',
         imageThumbnail: 'imageThumbnail',
         originalImage: 'originalImage',

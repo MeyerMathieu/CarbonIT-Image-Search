@@ -8,6 +8,8 @@ class HiveImagesMapper {
     'largeImage': imageUiModel.largeImage,
     'isFavorite': imageUiModel.isFavorite,
     'alt': imageUiModel.alt,
+    'width': imageUiModel.width,
+    'height': imageUiModel.height,
   };
 
   static ImageUiModel deserializeFromMap({required Map<String, dynamic> map}) => ImageUiModel(
@@ -17,5 +19,7 @@ class HiveImagesMapper {
     largeImage: map['largeImage'],
     isFavorite: map['isFavorite'],
     alt: map['alt'],
+    width: map['width'],
+    height: map['height'],
   );
 }

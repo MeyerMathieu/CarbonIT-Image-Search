@@ -36,12 +36,14 @@ void main() {
         tiny: 'tiny',
       );
       final List<ImageEntity> repositorySuccessResult = [
-        ImageEntity(id: 'id1', url: 'url1', source: imageSourceEntity),
-        ImageEntity(id: 'id2', url: 'url2', source: imageSourceEntity),
+        ImageEntity(id: 'id1', width: 1024, height: 1024, source: imageSourceEntity),
+        ImageEntity(id: 'id2', width: 1024, height: 1024, source: imageSourceEntity),
       ];
       final List<ImageUiModel> resultImagesItems = [
         ImageUiModel(
           id: repositorySuccessResult.first.id,
+          width: repositorySuccessResult.first.width,
+          height: repositorySuccessResult.first.height,
           imageThumbnail: imageSourceEntity.tiny,
           originalImage: imageSourceEntity.original,
           largeImage: imageSourceEntity.large,
@@ -49,6 +51,8 @@ void main() {
         ),
         ImageUiModel(
           id: repositorySuccessResult.last.id,
+          width: repositorySuccessResult.first.width,
+          height: repositorySuccessResult.first.height,
           imageThumbnail: imageSourceEntity.tiny,
           originalImage: imageSourceEntity.original,
           largeImage: imageSourceEntity.large,
@@ -109,6 +113,8 @@ void main() {
       );
       final ImageUiModel imageToAddToFavorites = ImageUiModel(
         id: '1',
+        width: 1024,
+        height: 1024,
         alt: 'alt',
         imageThumbnail: 'imageThumbnail',
         originalImage: 'originalImage',
@@ -131,6 +137,8 @@ void main() {
       // Given
       final ImageUiModel imageToRemoveFromFavorites = ImageUiModel(
         id: '1',
+        width: 1024,
+        height: 1024,
         alt: 'alt',
         imageThumbnail: 'imageThumbnail',
         originalImage: 'originalImage',

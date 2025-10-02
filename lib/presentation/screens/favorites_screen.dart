@@ -5,7 +5,9 @@ import 'package:carbon_it_images_search/presentation/view_models/favorites_scree
 import 'package:flutter/material.dart';
 
 class FavoritesScreen extends StatefulWidget {
-  const FavoritesScreen({super.key});
+  final Function() goToSearchTab;
+
+  const FavoritesScreen({super.key, required this.goToSearchTab});
 
   @override
   State<StatefulWidget> createState() => _FavoritesScreenState();
@@ -27,6 +29,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       builder: (BuildContext context, Widget? _) {
         return _Body(
           state: _viewModel.state,
+          goToSearch: widget.goToSearchTab,
           onFavoriteToggled: (ImageUiModel imageUiModel) {
             _viewModel.removeImageFromFavorites(imageUiModel: imageUiModel);
           },
@@ -38,9 +41,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
 class _Body extends StatelessWidget {
   final FavoritesState state;
+  final Function() goToSearch;
   final Function(ImageUiModel imageUiModel) onFavoriteToggled;
 
-  const _Body({required this.state, required this.onFavoriteToggled});
+  const _Body({required this.state, required this.goToSearch, required this.onFavoriteToggled});
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +54,7 @@ class _Body extends StatelessWidget {
         onFavoriteToggled: onFavoriteToggled,
       ),
       FavoritesStateLoading _ => _Loading(),
-      FavoritesStateEmpty _ => _Empty(),
+      FavoritesStateEmpty _ => _Empty(goToSearch: goToSearch),
       FavoritesStateError errorState => _Error(message: errorState.errorMessage),
     };
   }
@@ -147,13 +151,20 @@ class _Loading extends StatelessWidget {
 }
 
 class _Empty extends StatelessWidget {
+  final Function() goToSearch;
+
+  const _Empty({required this.goToSearch});
+
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [Text('No item to display.'), Text('Add your first favorite image from search screen !')],
-        // TODO : Bonus - Bouton redirect to searchScreen
+        children: [
+          Text('No item to display.'),
+          Text('Add your first favorite image from search screen !'),
+          ElevatedButton(onPressed: goToSearch, child: Text('Go to search')),
+        ],
       ),
     );
   }

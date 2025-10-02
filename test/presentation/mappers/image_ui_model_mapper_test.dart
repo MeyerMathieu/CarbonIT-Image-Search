@@ -9,7 +9,8 @@ void main() {
     // Given
     final ImageEntity imageEntity = ImageEntity(
       id: 'id',
-      url: 'url',
+      width: 1024,
+      height: 1024,
       alt: 'alt',
       source: ImageSourceEntity(
         original: 'original',
@@ -23,6 +24,8 @@ void main() {
     );
     final ImageUiModel expectedImageUiModelOutput = ImageUiModel(
       id: 'id',
+      width: 1024,
+      height: 1024,
       imageThumbnail: 'tiny',
       originalImage: 'original',
       largeImage: 'large',

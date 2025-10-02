@@ -10,7 +10,8 @@ class PexelsImagesMapper {
 
       return ImageEntity(
         id: photo['id'].toString(),
-        url: photo['url'],
+        width: photo['width'],
+        height: photo['height'],
         source: ImageSourceEntity(
           original: src['original'],
           large: src['large'],

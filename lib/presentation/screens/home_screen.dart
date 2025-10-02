@@ -11,6 +11,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  static const _searchTabIndex = 0;
 
   @override
   void initState() {
@@ -22,7 +23,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(bottom: TabBar(controller: _tabController, tabs: [Tab(text: 'Search'), Tab(text: 'Favorites')])),
-      body: TabBarView(controller: _tabController, children: [SearchScreen(), FavoritesScreen()]),
+      body: TabBarView(
+        controller: _tabController,
+        children: [SearchScreen(), FavoritesScreen(goToSearchTab: goToSearchTab)],
+      ),
     );
+  }
+
+  void goToSearchTab() {
+    _tabController.index = _searchTabIndex;
   }
 }

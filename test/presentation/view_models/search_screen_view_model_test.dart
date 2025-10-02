@@ -123,7 +123,7 @@ void main() {
       );
       viewModel.state = SearchState.success([imageToAddToFavorites]);
       when(
-        favoritesRepository.saveImageToFavorites(imageUiModel: imageToAddToFavorites),
+        favoritesRepository.saveImageToFavorites(imageUiModel: imageToAddToFavorites.copyWith(isFavorite: true)),
       ).thenAnswer((_) async => FavoritesRepositorySuccessResult());
 
       // When

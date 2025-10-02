@@ -7,7 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 class HiveFavoritesRepository extends FavoritesRepository {
   static const favoritesBoxName = 'favorites';
 
-  final Box<Map<String, dynamic>> favoritesBox;
+  final Box<Map> favoritesBox;
 
   HiveFavoritesRepository({required this.favoritesBox});
 
@@ -35,10 +35,7 @@ class HiveFavoritesRepository extends FavoritesRepository {
   @override
   Future<List<ImageUiModel>> getFavorites() async =>
       favoritesBox.values
-          .map(
-            (Map<dynamic, dynamic> mapItem) =>
-                HiveImagesMapper.deserializeFromMap(map: Map<String, dynamic>.from(mapItem)),
-          )
+          .map((Map mapItem) => HiveImagesMapper.deserializeFromMap(map: Map<String, dynamic>.from(mapItem)))
           .toList();
 
   @override

@@ -52,7 +52,9 @@ class SearchScreenViewModel extends ChangeNotifier {
   }
 
   Future<void> _addItemToFavorite({required ImageUiModel imageUiModel}) async {
-    final repositoryResponse = await favoritesRepository.saveImageToFavorites(imageUiModel: imageUiModel);
+    final repositoryResponse = await favoritesRepository.saveImageToFavorites(
+      imageUiModel: imageUiModel.copyWith(isFavorite: true),
+    );
     if (repositoryResponse is FavoritesRepositorySuccessResult) {
       final int imageItemIndex = state.imagesItems.indexOf(imageUiModel);
       state.imagesItems[imageItemIndex] = state.imagesItems[imageItemIndex].copyWith(isFavorite: true);

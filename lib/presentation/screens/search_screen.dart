@@ -112,6 +112,7 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO : Convert to switch
     if (state.isLoading) {
       return _LoadingState();
     } else if (state.errorMessage != null) {

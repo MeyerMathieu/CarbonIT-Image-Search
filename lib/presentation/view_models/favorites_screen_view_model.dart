@@ -25,7 +25,9 @@ class FavoritesScreenViewModel extends ChangeNotifier {
   }
 
   Future<void> removeImageFromFavorites({required ImageUiModel imageUiModel}) async {
-    final repositoryResponse = await favoritesRepository.removeImageFromFavorites(imageId: imageUiModel.id);
+    final FavoritesRepositoryResult repositoryResponse = await favoritesRepository.removeImageFromFavorites(
+      imageId: imageUiModel.id,
+    );
     if (repositoryResponse is FavoritesRepositorySuccessResult && state is FavoritesStateSuccess) {
       final List<ImageUiModel> newFavoritesList =
           (state as FavoritesStateSuccess).imagesItems

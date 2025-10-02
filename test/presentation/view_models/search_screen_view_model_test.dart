@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:carbon_it_images_search/data/entities/image_entity.dart';
 import 'package:carbon_it_images_search/data/entities/image_source_entity.dart';
 import 'package:carbon_it_images_search/domain/favorites_repository_result.dart';
@@ -161,6 +163,49 @@ void main() {
 
       // When
       await viewModel.toggleItemFavorite(imageUiModel: imageToRemoveFromFavorites);
+
+      // Then
+      expect(viewModel.state.imagesItems.first.isFavorite, false);
+    });
+  });
+
+  group('Favorite removed from another screen', () {
+    test('When a favorite is removed from repository, should update list item with new isFavorite value', () async {
+      // Given
+      final favoritesRepository = MockFavoritesRepository();
+      final imagesSearchRepository = MockImagesSearchRepository();
+      final favoritesStreamController = StreamController<Set<String>>();
+      when(favoritesRepository.watchFavoritesIds()).thenAnswer((_) => favoritesStreamController.stream);
+      final viewModel = SearchScreenViewModel(
+        imagesSearchRepository: imagesSearchRepository,
+        favoritesRepository: favoritesRepository,
+      );
+      viewModel.state = SearchState.success([
+        ImageUiModel(
+          id: '1',
+          width: 1024,
+          height: 1024,
+          alt: 'alt',
+          imageThumbnail: 'imageThumbnail',
+          originalImage: 'originalImage',
+          largeImage: 'largeImage',
+          isFavorite: true,
+        ),
+        ImageUiModel(
+          id: '2',
+          width: 1024,
+          height: 1024,
+          alt: 'alt',
+          imageThumbnail: 'imageThumbnail',
+          originalImage: 'originalImage',
+          largeImage: 'largeImage',
+          isFavorite: true,
+        ),
+      ]);
+
+      // When
+      favoritesStreamController.add(<String>{});
+      await Future.delayed(Duration.zero);
 
       // Then
       expect(viewModel.state.imagesItems.first.isFavorite, false);

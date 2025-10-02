@@ -1,3 +1,4 @@
+import 'package:carbon_it_images_search/domain/favorites_repository_result.dart';
 import 'package:carbon_it_images_search/domain/repositories/favorites_repository.dart';
 import 'package:carbon_it_images_search/presentation/models/image_ui_model.dart';
 import 'package:carbon_it_images_search/presentation/states/favorites_states.dart';
@@ -95,6 +96,119 @@ void main() {
   });
 
   group('removeImageFromFavorites', () {
-    // TODO
-  }, skip: true);
+    setUpAll(() {
+      provideDummy<FavoritesRepositoryResult>(const FavoritesRepositoryErrorResult(false));
+    });
+
+    test(
+      'When removing an item from favorites, if the list is empty, should set state to FavoritesStateEmpty',
+      () async {
+        // Given
+        final FavoritesRepository favoritesRepository = MockFavoritesRepository();
+        final FavoritesScreenViewModel favoritesScreenViewModel = FavoritesScreenViewModel(
+          favoritesRepository: favoritesRepository,
+        );
+        final ImageUiModel imageUiModel = ImageUiModel(
+          id: 'id1',
+          width: 1024,
+          height: 1024,
+          imageThumbnail: 'imageThumbnail',
+          originalImage: 'originalImage',
+          largeImage: 'largeImage',
+          isFavorite: true,
+        );
+        when(
+          favoritesRepository.removeImageFromFavorites(imageId: imageUiModel.id),
+        ).thenAnswer((_) async => FavoritesRepositorySuccessResult());
+
+        // When
+        await favoritesScreenViewModel.removeImageFromFavorites(imageUiModel: imageUiModel);
+
+        // Then
+        expect(favoritesScreenViewModel.state, isA<FavoritesStateEmpty>());
+      },
+    );
+
+    test(
+      'When removing an item from favorites, if the list is not empty, should set state to FavoritesStateSuccess with remaining items',
+      () async {
+        // Given
+        final FavoritesRepository favoritesRepository = MockFavoritesRepository();
+        final FavoritesScreenViewModel favoritesScreenViewModel = FavoritesScreenViewModel(
+          favoritesRepository: favoritesRepository,
+        );
+        final List<ImageUiModel> imagesList = [
+          ImageUiModel(
+            id: 'id1',
+            width: 1024,
+            height: 1024,
+            imageThumbnail: 'imageThumbnail',
+            originalImage: 'originalImage',
+            largeImage: 'largeImage',
+            isFavorite: true,
+          ),
+          ImageUiModel(
+            id: 'id2',
+            width: 1024,
+            height: 1024,
+            imageThumbnail: 'imageThumbnail',
+            originalImage: 'originalImage',
+            largeImage: 'largeImage',
+            isFavorite: true,
+          ),
+        ];
+        favoritesScreenViewModel.state = FavoritesStateSuccess(imagesList);
+        when(
+          favoritesRepository.removeImageFromFavorites(imageId: imagesList.first.id),
+        ).thenAnswer((_) async => FavoritesRepositorySuccessResult());
+
+        // When
+        await favoritesScreenViewModel.removeImageFromFavorites(imageUiModel: imagesList.first);
+
+        // Then
+        expect(favoritesScreenViewModel.state, isA<FavoritesStateSuccess>());
+        expect((favoritesScreenViewModel.state as FavoritesStateSuccess).imagesItems.length, 1);
+        expect((favoritesScreenViewModel.state as FavoritesStateSuccess).imagesItems.first, imagesList.last);
+      },
+    );
+
+    test('When removing an item from favorites, if the repository returns an error, should not change state', () async {
+      // Given
+      final FavoritesRepository favoritesRepository = MockFavoritesRepository();
+      final FavoritesScreenViewModel favoritesScreenViewModel = FavoritesScreenViewModel(
+        favoritesRepository: favoritesRepository,
+      );
+      final List<ImageUiModel> imagesList = [
+        ImageUiModel(
+          id: 'id1',
+          width: 1024,
+          height: 1024,
+          imageThumbnail: 'imageThumbnail',
+          originalImage: 'originalImage',
+          largeImage: 'largeImage',
+          isFavorite: true,
+        ),
+        ImageUiModel(
+          id: 'id2',
+          width: 1024,
+          height: 1024,
+          imageThumbnail: 'imageThumbnail',
+          originalImage: 'originalImage',
+          largeImage: 'largeImage',
+          isFavorite: true,
+        ),
+      ];
+      favoritesScreenViewModel.state = FavoritesStateSuccess(imagesList);
+      when(
+        favoritesRepository.removeImageFromFavorites(imageId: imagesList.first.id),
+      ).thenAnswer((_) async => FavoritesRepositoryErrorResult('Error'));
+
+      // When
+      await favoritesScreenViewModel.removeImageFromFavorites(imageUiModel: imagesList.first);
+
+      // Then
+      expect(favoritesScreenViewModel.state, isA<FavoritesStateSuccess>());
+      expect((favoritesScreenViewModel.state as FavoritesStateSuccess).imagesItems.length, 2);
+    });
+  });
 }

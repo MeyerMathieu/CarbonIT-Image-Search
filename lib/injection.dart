@@ -30,7 +30,9 @@ Future<void> setupInjection() async {
       favoritesRepository: getItInstance<FavoritesRepository>(),
     ),
   );
-  getItInstance.registerLazySingleton<FavoritesScreenViewModel>(() => FavoritesScreenViewModel());
+  getItInstance.registerLazySingleton<FavoritesScreenViewModel>(
+    () => FavoritesScreenViewModel(favoritesRepository: getItInstance<FavoritesRepository>()),
+  );
 
   // Misc
   final apiKey = Secrets.apiKey;

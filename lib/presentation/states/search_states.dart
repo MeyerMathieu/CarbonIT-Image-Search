@@ -1,5 +1,6 @@
 import 'package:carbon_it_images_search/presentation/models/image_ui_model.dart';
 
+// TODO : Convert to sealed class
 class SearchState {
   final bool isLoading;
   final List<ImageUiModel> imagesItems;

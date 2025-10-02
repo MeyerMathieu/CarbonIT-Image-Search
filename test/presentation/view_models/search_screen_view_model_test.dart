@@ -12,6 +12,7 @@ import 'package:mockito/mockito.dart';
 
 import 'search_screen_view_model_test.mocks.dart';
 
+// TODO : Move mocks in another file
 @GenerateNiceMocks([MockSpec<ImagesSearchRepository>(), MockSpec<FavoritesRepository>()])
 void main() {
   group('submitSearch', () {

@@ -14,10 +14,12 @@ class SearchScreenViewModel extends ChangeNotifier {
   final FavoritesRepository favoritesRepository;
   SearchState state = const SearchState.idle();
   Set<String> _favoritesIds = {};
+  StreamSubscription<Set<String>>? _favoritesIdsStreamSubscription;
 
   SearchScreenViewModel({required this.imagesSearchRepository, required this.favoritesRepository}) {
-    favoritesRepository.watchFavoritesIds().listen((ids) {
+    _favoritesIdsStreamSubscription = favoritesRepository.watchFavoritesIds().listen((ids) {
       _favoritesIds = ids;
+      _refreshFavoritesOnCurrentList();
     });
   }
 
@@ -48,15 +50,17 @@ class SearchScreenViewModel extends ChangeNotifier {
   Future<void> toggleItemFavorite({required ImageUiModel imageUiModel}) async {
     _favoritesIds.contains(imageUiModel.id)
         ? _removeItemFromFavorite(imageUiModel: imageUiModel)
-        : _addItemToFavorite(imageUiModel: imageUiModel);
+        : _addItemToFavorite(imageToAdd: imageUiModel);
   }
 
-  Future<void> _addItemToFavorite({required ImageUiModel imageUiModel}) async {
+  Future<void> _addItemToFavorite({required ImageUiModel imageToAdd}) async {
     final repositoryResponse = await favoritesRepository.saveImageToFavorites(
-      imageUiModel: imageUiModel.copyWith(isFavorite: true),
+      imageUiModel: imageToAdd.copyWith(isFavorite: true),
     );
     if (repositoryResponse is FavoritesRepositorySuccessResult) {
-      final int imageItemIndex = state.imagesItems.indexOf(imageUiModel);
+      final int imageItemIndex = state.imagesItems.indexWhere(
+        (ImageUiModel imageUiModel) => imageUiModel.id == imageToAdd.id,
+      );
       state.imagesItems[imageItemIndex] = state.imagesItems[imageItemIndex].copyWith(isFavorite: true);
       notifyListeners();
     } else {
@@ -73,5 +77,25 @@ class SearchScreenViewModel extends ChangeNotifier {
     } else {
       // TODO : Display error snackbar ?
     }
+  }
+
+  void _refreshFavoritesOnCurrentList() {
+    if (state.imagesItems.isEmpty) {
+      return;
+    }
+    final updatedImages =
+        state.imagesItems
+            .map(
+              (ImageUiModel imageUiModel) => imageUiModel.copyWith(isFavorite: _favoritesIds.contains(imageUiModel.id)),
+            )
+            .toList();
+    state = state.copyWith(imagesItems: updatedImages);
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _favoritesIdsStreamSubscription?.cancel();
+    super.dispose();
   }
 }

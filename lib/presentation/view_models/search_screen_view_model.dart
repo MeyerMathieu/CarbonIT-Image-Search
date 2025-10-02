@@ -53,14 +53,13 @@ class SearchScreenViewModel extends ChangeNotifier {
     final repositoryResponse = await favoritesRepository.saveImageToFavorites(
       imageUiModel: imageToAdd.copyWith(isFavorite: true),
     );
-    if (repositoryResponse is FavoritesRepositorySuccessResult && state is SearchStateSuccess) {
-      // TODO : Arrange cast
-      final updatedList = (state as SearchStateSuccess).imagesItems;
-      final int imageItemIndex = updatedList.indexWhere(
+    if (repositoryResponse is FavoritesRepositorySuccessResult) {
+      final List<ImageUiModel> imagesDisplayed = (state as SearchStateSuccess).imagesItems;
+      final int imageItemIndex = imagesDisplayed.indexWhere(
         (ImageUiModel imageUiModel) => imageUiModel.id == imageToAdd.id,
       );
-      updatedList[imageItemIndex] = updatedList[imageItemIndex].copyWith(isFavorite: true);
-      state = SearchStateSuccess(updatedList);
+      imagesDisplayed[imageItemIndex] = imagesDisplayed[imageItemIndex].copyWith(isFavorite: true);
+      state = SearchStateSuccess(imagesDisplayed);
       notifyListeners();
     } else {
       // TODO : Display error snackbar ?
@@ -68,15 +67,16 @@ class SearchScreenViewModel extends ChangeNotifier {
   }
 
   Future<void> _removeItemFromFavorite({required ImageUiModel imageToRemove}) async {
-    final repositoryResponse = await favoritesRepository.removeImageFromFavorites(imageId: imageToRemove.id);
+    final FavoritesRepositoryResult repositoryResponse = await favoritesRepository.removeImageFromFavorites(
+      imageId: imageToRemove.id,
+    );
     if (repositoryResponse is FavoritesRepositorySuccessResult) {
-      // TODO : Arrange cast
-      final int imageItemIndex = (state as SearchStateSuccess).imagesItems.indexWhere(
+      final List<ImageUiModel> imagesDisplayed = (state as SearchStateSuccess).imagesItems;
+      final int imageItemIndex = imagesDisplayed.indexWhere(
         (ImageUiModel imageUiModel) => imageUiModel.id == imageToRemove.id,
       );
-      final updatedList = (state as SearchStateSuccess).imagesItems;
-      updatedList[imageItemIndex] = updatedList[imageItemIndex].copyWith(isFavorite: false);
-      state = SearchStateSuccess(updatedList);
+      imagesDisplayed[imageItemIndex] = imagesDisplayed[imageItemIndex].copyWith(isFavorite: false);
+      state = SearchStateSuccess(imagesDisplayed);
       notifyListeners();
     } else {
       // TODO : Display error snackbar ?
@@ -84,7 +84,7 @@ class SearchScreenViewModel extends ChangeNotifier {
   }
 
   void _refreshFavoritesOnCurrentList() {
-    if ((state as SearchStateSuccess).imagesItems.isEmpty) {
+    if (state is! SearchStateSuccess || (state as SearchStateSuccess).imagesItems.isEmpty) {
       return;
     }
     final updatedImages =

@@ -37,6 +37,22 @@ void main() {
     );
     final String searchValue = 'searchValue';
 
+    test('When a search with empty field is submitted, should do nothing', () async {
+      // Given
+      final viewModel = SearchScreenViewModel(
+        imagesSearchRepository: imagesSearchRepository,
+        favoritesRepository: favoritesRepository,
+      );
+      final previousState = viewModel.state;
+
+      // When
+      await viewModel.submitSearch(searchValue: '');
+
+      // Then
+      expect(viewModel.state, same(previousState));
+      verifyZeroInteractions(imagesSearchRepository);
+    });
+
     test('When a search is submitted and repository returns a list of items, should set state items', () async {
       // Given
       final List<ImageEntity> repositorySuccessResult = [
@@ -67,6 +83,7 @@ void main() {
 
       // Then
       expect(viewModel.state, isA<SearchStateEmpty>());
+      expect((viewModel.state as SearchStateEmpty).lastQuery, searchValue);
     });
 
     test('When a search is submitted, should set state to loading', () {

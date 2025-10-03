@@ -42,7 +42,7 @@ class SearchScreenViewModel extends ChangeNotifier {
         _hasMoreItems = false;
         state = SearchStateEmpty(lastQuery: searchValue);
       } else {
-        state = SearchStateSuccess(imagesToDisplay);
+        state = SearchStateSuccess(_mapWithFavorites(imagesToDisplay));
       }
     } catch (exception) {
       state = SearchStateError(exception.toString());
@@ -65,7 +65,7 @@ class SearchScreenViewModel extends ChangeNotifier {
       if (imagesToDisplay.isEmpty) {
         _hasMoreItems = false;
       } else {
-        state = SearchStateSuccess(currentItems..addAll(imagesToDisplay));
+        state = SearchStateSuccess(_mapWithFavorites(currentItems..addAll(imagesToDisplay)));
       }
     } catch (_) {
     } finally {
@@ -128,15 +128,17 @@ class SearchScreenViewModel extends ChangeNotifier {
     if (state is! SearchStateSuccess || (state as SearchStateSuccess).imagesItems.isEmpty) {
       return;
     }
-    final updatedImages =
-        (state as SearchStateSuccess).imagesItems
-            .map(
-              (ImageUiModel imageUiModel) => imageUiModel.copyWith(isFavorite: _favoritesIds.contains(imageUiModel.id)),
-            )
-            .toList();
+    final updatedImages = _mapWithFavorites((state as SearchStateSuccess).imagesItems);
     state = SearchStateSuccess(updatedImages);
     notifyListeners();
   }
+
+  List<ImageUiModel> _mapWithFavorites(List<ImageUiModel> imagesList) =>
+      imagesList
+          .map(
+            (ImageUiModel imageUiModel) => imageUiModel.copyWith(isFavorite: _favoritesIds.contains(imageUiModel.id)),
+          )
+          .toList();
 
   @override
   void dispose() {

@@ -105,6 +105,37 @@ void main() {
       // Then
       expect(viewModel.state, isA<SearchStateError>());
     });
+
+    test(
+      'When a search is submitted and repository returns a list of items with some already in favorites, should set state items',
+      () async {
+        // Given
+        final List<ImageEntity> repositorySuccessResult = [
+          ImageEntity(id: 'id1', width: 1024, height: 1024, alt: 'alt', source: testImageSourceEntity),
+          ImageEntity(id: 'id2', width: 1024, height: 1024, alt: 'alt', source: testImageSourceEntity),
+        ];
+        final List<ImageUiModel> resultImagesItems = [
+          buildTestImageUiModel(id: repositorySuccessResult.first.id, isFavorite: true),
+          buildTestImageUiModel(id: repositorySuccessResult.last.id, isFavorite: true),
+        ];
+        when(imagesSearchRepository.searchImages(search: searchValue)).thenAnswer((_) async => repositorySuccessResult);
+        final controller = StreamController<Set<String>>();
+        when(favoritesRepository.watchFavoritesIds()).thenAnswer((_) => controller.stream);
+        controller.add(<String>{'id1', 'id2'});
+        final SearchScreenViewModel viewModel = SearchScreenViewModel(
+          imagesSearchRepository: imagesSearchRepository,
+          favoritesRepository: favoritesRepository,
+        );
+
+        // When
+        await viewModel.submitSearch(searchValue: searchValue);
+
+        // Then
+        expect(viewModel.state, isA<SearchStateSuccess>());
+        expect((viewModel.state as SearchStateSuccess).imagesItems.length, 2);
+        expect((viewModel.state as SearchStateSuccess).imagesItems, resultImagesItems);
+      },
+    );
   });
 
   group('loadMoreItems', () {

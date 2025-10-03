@@ -7,7 +7,6 @@ class ImageEntity extends Equatable {
   final int height;
   final String? alt;
   final ImageSourceEntity source;
-  // TODO : Add other fields
 
   const ImageEntity({required this.id, required this.width, required this.height, required this.source, this.alt});
 

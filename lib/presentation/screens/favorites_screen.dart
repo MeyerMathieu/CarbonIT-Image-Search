@@ -101,6 +101,7 @@ class _Empty extends StatelessWidget {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        spacing: 24,
         children: [
           Text('No item to display.'),
           Text('Add your first favorite image from search screen !'),

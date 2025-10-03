@@ -17,6 +17,16 @@ import 'search_screen_view_model_test.mocks.dart';
 // TODO : Move mocks in another file
 @GenerateNiceMocks([MockSpec<ImagesSearchRepository>(), MockSpec<FavoritesRepository>()])
 void main() {
+  final ImageSourceEntity testImageSourceEntity = ImageSourceEntity(
+    original: 'original',
+    large: 'large',
+    medium: 'medium',
+    small: 'small',
+    portrait: 'portrait',
+    landscape: 'landscape',
+    tiny: 'tiny',
+  );
+
   group('submitSearch', () {
     final ImagesSearchRepository imagesSearchRepository = MockImagesSearchRepository();
     final FavoritesRepository favoritesRepository = MockFavoritesRepository();
@@ -28,38 +38,13 @@ void main() {
 
     test('When a search is submitted and repository returns a list of items, should set state items', () async {
       // Given
-      final ImageSourceEntity imageSourceEntity = ImageSourceEntity(
-        original: 'original',
-        large: 'large',
-        medium: 'medium',
-        small: 'small',
-        portrait: 'portrait',
-        landscape: 'landscape',
-        tiny: 'tiny',
-      );
       final List<ImageEntity> repositorySuccessResult = [
-        ImageEntity(id: 'id1', width: 1024, height: 1024, source: imageSourceEntity),
-        ImageEntity(id: 'id2', width: 1024, height: 1024, source: imageSourceEntity),
+        ImageEntity(id: 'id1', width: 1024, height: 1024, alt: 'alt', source: testImageSourceEntity),
+        ImageEntity(id: 'id2', width: 1024, height: 1024, alt: 'alt', source: testImageSourceEntity),
       ];
       final List<ImageUiModel> resultImagesItems = [
-        ImageUiModel(
-          id: repositorySuccessResult.first.id,
-          width: repositorySuccessResult.first.width,
-          height: repositorySuccessResult.first.height,
-          imageThumbnail: imageSourceEntity.tiny,
-          originalImage: imageSourceEntity.original,
-          largeImage: imageSourceEntity.large,
-          isFavorite: false,
-        ),
-        ImageUiModel(
-          id: repositorySuccessResult.last.id,
-          width: repositorySuccessResult.first.width,
-          height: repositorySuccessResult.first.height,
-          imageThumbnail: imageSourceEntity.tiny,
-          originalImage: imageSourceEntity.original,
-          largeImage: imageSourceEntity.large,
-          isFavorite: false,
-        ),
+        _buildTestImageUiModel(id: repositorySuccessResult.first.id),
+        _buildTestImageUiModel(id: repositorySuccessResult.last.id),
       ];
       when(imagesSearchRepository.searchImages(search: searchValue)).thenAnswer((_) async => repositorySuccessResult);
 
@@ -70,6 +55,17 @@ void main() {
       expect(viewModel.state, isA<SearchStateSuccess>());
       expect((viewModel.state as SearchStateSuccess).imagesItems.length, 2);
       expect((viewModel.state as SearchStateSuccess).imagesItems, resultImagesItems);
+    });
+
+    test('When a search is submitted and repository returns an empty list, should set state items', () async {
+      // Given
+      when(imagesSearchRepository.searchImages(search: searchValue)).thenAnswer((_) async => []);
+
+      // When
+      await viewModel.submitSearch(searchValue: searchValue);
+
+      // Then
+      expect(viewModel.state, isA<SearchStateEmpty>());
     });
 
     test('When a search is submitted, should set state to loading', () {
@@ -102,87 +98,23 @@ void main() {
     );
     final String searchValue = 'searchValue';
 
-    test('When loading more items, if current query is null, should do nothing', () {});
-
-    test('When loading more items, if hasMoreItems is false, should do nothing', () {});
     test(
       'When loading more items, if repository returns successfully, should add new items to SearchSuccessState list',
       () async {
         // Given
-        final ImageSourceEntity imageSourceEntity = ImageSourceEntity(
-          original: 'original',
-          large: 'large',
-          medium: 'medium',
-          small: 'small',
-          portrait: 'portrait',
-          landscape: 'landscape',
-          tiny: 'tiny',
-        );
         final List<ImageEntity> originalRequestSuccessResult = [
-          ImageEntity(id: 'id1', width: 1024, height: 1024, source: imageSourceEntity),
-          ImageEntity(id: 'id2', width: 1024, height: 1024, source: imageSourceEntity),
+          ImageEntity(id: 'id1', width: 1024, height: 1024, alt: 'alt', source: testImageSourceEntity),
+          ImageEntity(id: 'id2', width: 1024, height: 1024, alt: 'alt', source: testImageSourceEntity),
         ];
         final List<ImageEntity> repositorySuccessResult = [
-          ImageEntity(id: 'id3', width: 1024, height: 1024, source: imageSourceEntity),
-          ImageEntity(id: 'id4', width: 1024, height: 1024, source: imageSourceEntity),
-        ];
-        final List<ImageUiModel> originalList = [
-          ImageUiModel(
-            id: 'id1',
-            width: 1024,
-            height: 1024,
-            imageThumbnail: 'tiny',
-            originalImage: 'original',
-            largeImage: 'large',
-            isFavorite: false,
-          ),
-          ImageUiModel(
-            id: 'id2',
-            width: 1024,
-            height: 1024,
-            imageThumbnail: 'tiny',
-            originalImage: 'original',
-            largeImage: 'large',
-            isFavorite: false,
-          ),
+          ImageEntity(id: 'id3', width: 1024, height: 1024, alt: 'alt', source: testImageSourceEntity),
+          ImageEntity(id: 'id4', width: 1024, height: 1024, alt: 'alt', source: testImageSourceEntity),
         ];
         final List<ImageUiModel> resultImagesItems = [
-          ImageUiModel(
-            id: 'id1',
-            width: 1024,
-            height: 1024,
-            imageThumbnail: 'tiny',
-            originalImage: 'original',
-            largeImage: 'large',
-            isFavorite: false,
-          ),
-          ImageUiModel(
-            id: 'id2',
-            width: 1024,
-            height: 1024,
-            imageThumbnail: 'tiny',
-            originalImage: 'original',
-            largeImage: 'large',
-            isFavorite: false,
-          ),
-          ImageUiModel(
-            id: 'id3',
-            width: 1024,
-            height: 1024,
-            imageThumbnail: 'tiny',
-            originalImage: 'original',
-            largeImage: 'large',
-            isFavorite: false,
-          ),
-          ImageUiModel(
-            id: 'id4',
-            width: 1024,
-            height: 1024,
-            imageThumbnail: 'tiny',
-            originalImage: 'original',
-            largeImage: 'large',
-            isFavorite: false,
-          ),
+          _buildTestImageUiModel(id: 'id1'),
+          _buildTestImageUiModel(id: 'id2'),
+          _buildTestImageUiModel(id: 'id3'),
+          _buildTestImageUiModel(id: 'id4'),
         ];
         when(
           imagesSearchRepository.searchImages(search: searchValue, page: 1),
@@ -201,8 +133,44 @@ void main() {
         expect((viewModel.state as SearchStateSuccess).imagesItems, resultImagesItems);
       },
     );
-    test('When loading more items, if repository returns successfully with empty list, should do nothing', () {});
-    test('When loading more items, if repository returns a failure, should do nothing', () {});
+
+    test(
+      'When loading more items, if repository has returned successfully with empty list, should do nothing and do not call repository again next time',
+      () async {
+        // Given
+        when(imagesSearchRepository.searchImages(search: searchValue, page: 1)).thenAnswer((_) async => []);
+        when(imagesSearchRepository.searchImages(search: searchValue, page: 2)).thenAnswer((_) async => []);
+        await viewModel.submitSearch(searchValue: searchValue);
+        reset(imagesSearchRepository);
+
+        // When
+        await viewModel.loadMoreItems();
+
+        // Then
+        expect(viewModel.state, isA<SearchStateEmpty>());
+        verifyNever(imagesSearchRepository.searchImages(search: searchValue, page: 2));
+      },
+    );
+
+    test('When loading more items, if repository returns a failure, should still keep success state', () async {
+      // Given
+      final List<ImageEntity> originalRequestSuccessResult = [
+        ImageEntity(id: 'id1', width: 1024, height: 1024, alt: 'alt', source: testImageSourceEntity),
+        ImageEntity(id: 'id2', width: 1024, height: 1024, alt: 'alt', source: testImageSourceEntity),
+      ];
+      when(
+        imagesSearchRepository.searchImages(search: searchValue, page: 1),
+      ).thenAnswer((_) async => originalRequestSuccessResult);
+      when(imagesSearchRepository.searchImages(search: searchValue, page: 2)).thenThrow((_) async => []);
+      await viewModel.submitSearch(searchValue: searchValue);
+
+      // When
+      await viewModel.loadMoreItems();
+
+      // Then
+      expect(viewModel.state, isA<SearchStateSuccess>());
+      expect((viewModel.state as SearchStateSuccess).imagesItems.length, 2);
+    });
   });
 
   group('toggleItemFavorite', () {
@@ -218,16 +186,7 @@ void main() {
         imagesSearchRepository: imagesSearchRepository,
         favoritesRepository: favoritesRepository,
       );
-      final ImageUiModel imageToAddToFavorites = ImageUiModel(
-        id: '1',
-        width: 1024,
-        height: 1024,
-        alt: 'alt',
-        imageThumbnail: 'imageThumbnail',
-        originalImage: 'originalImage',
-        largeImage: 'largeImage',
-        isFavorite: false,
-      );
+      final ImageUiModel imageToAddToFavorites = _buildTestImageUiModel(id: '1');
       viewModel.state = SearchStateSuccess([imageToAddToFavorites]);
       when(
         favoritesRepository.saveImageToFavorites(imageUiModel: imageToAddToFavorites.copyWith(isFavorite: true)),
@@ -244,26 +203,8 @@ void main() {
     test('When the item is already in favorites, should remove it from repository', () async {
       // Given
       final List<ImageUiModel> searchItems = [
-        ImageUiModel(
-          id: '1',
-          width: 1024,
-          height: 1024,
-          alt: 'alt',
-          imageThumbnail: 'imageThumbnail',
-          originalImage: 'originalImage',
-          largeImage: 'largeImage',
-          isFavorite: true,
-        ),
-        ImageUiModel(
-          id: '2',
-          width: 1024,
-          height: 1024,
-          alt: 'alt',
-          imageThumbnail: 'imageThumbnail',
-          originalImage: 'originalImage',
-          largeImage: 'largeImage',
-          isFavorite: false,
-        ),
+        _buildTestImageUiModel(id: '1', isFavorite: true),
+        _buildTestImageUiModel(id: '2'),
       ];
       final favoritesRepository = MockFavoritesRepository();
       final imagesSearchRepository = MockImagesSearchRepository();
@@ -302,26 +243,8 @@ void main() {
         favoritesRepository: favoritesRepository,
       );
       viewModel.state = SearchStateSuccess([
-        ImageUiModel(
-          id: '1',
-          width: 1024,
-          height: 1024,
-          alt: 'alt',
-          imageThumbnail: 'imageThumbnail',
-          originalImage: 'originalImage',
-          largeImage: 'largeImage',
-          isFavorite: true,
-        ),
-        ImageUiModel(
-          id: '2',
-          width: 1024,
-          height: 1024,
-          alt: 'alt',
-          imageThumbnail: 'imageThumbnail',
-          originalImage: 'originalImage',
-          largeImage: 'largeImage',
-          isFavorite: true,
-        ),
+        _buildTestImageUiModel(id: '1', isFavorite: true),
+        _buildTestImageUiModel(id: '2', isFavorite: true),
       ]);
 
       // When
@@ -334,3 +257,14 @@ void main() {
     });
   });
 }
+
+ImageUiModel _buildTestImageUiModel({required String id, bool isFavorite = false}) => ImageUiModel(
+  id: id,
+  width: 1024,
+  height: 1024,
+  alt: 'alt',
+  imageThumbnail: 'tiny',
+  originalImage: 'original',
+  largeImage: 'large',
+  isFavorite: isFavorite,
+);

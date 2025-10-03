@@ -117,7 +117,6 @@ class _SearchBar extends StatelessWidget {
   }
 
   void _performSearch(BuildContext context) {
-    // TODO : Handle empty field
     final textFieldContent = searchTextEditingController.text.trim();
     onSearchSubmitted(textFieldContent);
     _hideKeyboard(context);

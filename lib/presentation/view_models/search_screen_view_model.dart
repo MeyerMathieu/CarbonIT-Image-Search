@@ -29,6 +29,9 @@ class SearchScreenViewModel extends ChangeNotifier {
   }
 
   Future<void> submitSearch({required String searchValue}) async {
+    if (searchValue.isEmpty) {
+      return;
+    }
     _currentPage = 1;
     _currentQuery = searchValue;
     state = SearchStateLoading();

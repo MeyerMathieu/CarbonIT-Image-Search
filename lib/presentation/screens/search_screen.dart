@@ -2,6 +2,8 @@ import 'package:carbon_it_images_search/injection.dart';
 import 'package:carbon_it_images_search/presentation/models/image_ui_model.dart';
 import 'package:carbon_it_images_search/presentation/states/search_states.dart';
 import 'package:carbon_it_images_search/presentation/view_models/search_screen_view_model.dart';
+import 'package:carbon_it_images_search/presentation/widgets/image_item_params.dart';
+import 'package:carbon_it_images_search/presentation/widgets/image_item_widget.dart';
 import 'package:flutter/material.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -183,8 +185,13 @@ class _SuccessState extends StatelessWidget {
               mainAxisSpacing: _paddingBetweenItems,
             ),
             itemCount: images.length,
-            itemBuilder:
-                (BuildContext context, index) => _ImageItem(image: images[index], onFavoriteToggled: onFavoriteToggled),
+            itemBuilder: (BuildContext context, index) {
+              final ImageUiModel currentImage = images[index];
+              return ImageItem(
+                params: ImageItemParams.forSearchResults(imageUiModel: currentImage),
+                onImageActionPerformed: () => onFavoriteToggled(currentImage),
+              );
+            },
             padding: EdgeInsets.only(bottom: _bottomPadding, left: _paddingBetweenItems, right: _paddingBetweenItems),
           ),
         ),
@@ -200,64 +207,6 @@ class _LoadingMoreItem extends StatelessWidget {
       Container(color: Colors.transparent, child: Center(child: CircularProgressIndicator()));
 }
 
-class _ImageItem extends StatelessWidget {
-  final ImageUiModel image;
-  final Function(ImageUiModel) onFavoriteToggled;
-
-  const _ImageItem({required this.image, required this.onFavoriteToggled});
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onDoubleTap: () => onFavoriteToggled(image),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.network(
-              image.imageThumbnail,
-              fit: BoxFit.cover,
-              loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                if (loadingProgress == null) {
-                  return child;
-                }
-                return Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Container(color: Colors.black12),
-                    const Center(
-                      child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
-                    ),
-                  ],
-                );
-              },
-              errorBuilder:
-                  (BuildContext context, Object error, StackTrace? stackTrace) => Container(
-                    color: Colors.black12,
-                    alignment: Alignment.center,
-                    child: const Icon(Icons.broken_image, size: 24),
-                  ),
-              gaplessPlayback: true,
-            ),
-            Positioned(
-              top: 16,
-              right: 16,
-              child: InkWell(
-                onTap: () => onFavoriteToggled(image),
-                child:
-                    (image.isFavorite)
-                        ? Icon(Icons.bookmark, color: Colors.red)
-                        : Icon(Icons.bookmark_add_outlined, color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _EmptyState extends StatelessWidget {
   final String? searchQuery;
 
@@ -271,7 +220,7 @@ class _EmptyState extends StatelessWidget {
         children:
             (searchQuery != null)
                 ? [Text('No item found for "$searchQuery"'), Text('Try a new search !')]
-                : [Text('No item to display.'), Text('Make a search to display images !')],
+                : [Text('No item to display.'), Text('Search something to display images !')],
       ),
     );
   }

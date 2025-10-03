@@ -1,6 +1,7 @@
 import 'package:carbon_it_images_search/injection.dart';
 import 'package:carbon_it_images_search/presentation/models/image_ui_model.dart';
 import 'package:carbon_it_images_search/presentation/states/search_states.dart';
+import 'package:carbon_it_images_search/presentation/utils/cat_picker.dart';
 import 'package:carbon_it_images_search/presentation/view_models/search_screen_view_model.dart';
 import 'package:carbon_it_images_search/presentation/widgets/image_item_params.dart';
 import 'package:carbon_it_images_search/presentation/widgets/image_item_widget.dart';
@@ -219,8 +220,16 @@ class _EmptyState extends StatelessWidget {
         spacing: 24,
         children:
             (searchQuery != null)
-                ? [Text('No item found for "$searchQuery"'), Text('Try a new search !')]
-                : [Text('No item to display.'), Text('Search something to display images !')],
+                ? [
+                  Text('No item found for "$searchQuery"'),
+                  Image.asset(height: 256, CatPicker.pickImageAsset()),
+                  Text('Try a new search !'),
+                ]
+                : [
+                  Text('No item to display.'),
+                  Image.asset(height: 256, CatPicker.pickImageAsset()),
+                  Text('Search something to display images !'),
+                ],
       ),
     );
   }

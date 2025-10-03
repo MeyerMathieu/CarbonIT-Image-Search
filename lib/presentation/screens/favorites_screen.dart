@@ -1,6 +1,7 @@
 import 'package:carbon_it_images_search/injection.dart';
 import 'package:carbon_it_images_search/presentation/models/image_ui_model.dart';
 import 'package:carbon_it_images_search/presentation/states/favorites_states.dart';
+import 'package:carbon_it_images_search/presentation/utils/cat_picker.dart';
 import 'package:carbon_it_images_search/presentation/view_models/favorites_screen_view_model.dart';
 import 'package:carbon_it_images_search/presentation/widgets/image_item_params.dart';
 import 'package:carbon_it_images_search/presentation/widgets/image_item_widget.dart';
@@ -104,6 +105,7 @@ class _Empty extends StatelessWidget {
         spacing: 24,
         children: [
           Text('No item to display.'),
+          Image.asset(height: 256, CatPicker.pickImageAsset()),
           Text('Add your first favorite image from search screen !'),
           ElevatedButton(onPressed: goToSearch, child: Text('Go to search')),
         ],

@@ -22,7 +22,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(bottom: TabBar(controller: _tabController, tabs: [Tab(text: 'Search'), Tab(text: 'Favorites')])),
+      appBar: AppBar(
+        backgroundColor: Color(0xff2A2C2B),
+        title: Row(
+          children: [
+            Image.asset('assets/images/logo.jpg', height: 48, width: 48),
+            SizedBox(width: 24),
+            Text('Carbon IT Images Search'),
+          ],
+        ),
+        bottom: TabBar(controller: _tabController, tabs: [Tab(text: 'Search'), Tab(text: 'Favorites')]),
+      ),
       body: TabBarView(
         controller: _tabController,
         children: [SearchScreen(), FavoritesScreen(goToSearchTab: goToSearchTab)],

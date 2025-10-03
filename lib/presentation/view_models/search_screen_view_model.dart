@@ -67,8 +67,7 @@ class SearchScreenViewModel extends ChangeNotifier {
       } else {
         state = SearchStateSuccess(currentItems..addAll(imagesToDisplay));
       }
-    } catch (exception) {
-      // TODO : Log ?
+    } catch (_) {
     } finally {
       isLoadingMore = false;
       notifyListeners();

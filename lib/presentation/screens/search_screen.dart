@@ -216,6 +216,7 @@ class _EmptyState extends StatelessWidget {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        spacing: 24,
         children:
             (searchQuery != null)
                 ? [Text('No item found for "$searchQuery"'), Text('Try a new search !')]

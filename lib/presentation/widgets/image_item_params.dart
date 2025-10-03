@@ -6,12 +6,14 @@ class ImageItemParams {
   final bool isFavorite;
   final double aspectRatio;
   final String imageSource;
+  final String? alt;
 
   const ImageItemParams({
     required this.boxFit,
     required this.isFavorite,
     required this.aspectRatio,
     required this.imageSource,
+    required this.alt,
   });
 
   factory ImageItemParams.forSearchResults({required ImageUiModel imageUiModel}) => ImageItemParams(
@@ -19,6 +21,7 @@ class ImageItemParams {
     isFavorite: imageUiModel.isFavorite,
     aspectRatio: 1,
     imageSource: imageUiModel.imageThumbnail,
+    alt: imageUiModel.alt,
   );
 
   factory ImageItemParams.forFavoritesList({required ImageUiModel imageUiModel}) => ImageItemParams(
@@ -26,5 +29,6 @@ class ImageItemParams {
     isFavorite: imageUiModel.isFavorite,
     aspectRatio: imageUiModel.width / imageUiModel.height,
     imageSource: imageUiModel.largeImage,
+    alt: imageUiModel.alt,
   );
 }

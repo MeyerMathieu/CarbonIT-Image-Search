@@ -42,6 +42,7 @@ class ImageItem extends StatelessWidget {
                       child: const Icon(Icons.broken_image, size: 24),
                     ),
                 gaplessPlayback: true,
+                semanticLabel: params.alt,
               ),
               Positioned(
                 top: 16,

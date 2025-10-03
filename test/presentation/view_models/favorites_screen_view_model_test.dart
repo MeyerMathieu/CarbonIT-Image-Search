@@ -6,6 +6,7 @@ import 'package:carbon_it_images_search/presentation/view_models/favorites_scree
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
+import '../../tests_utils.dart';
 import 'search_screen_view_model_test.mocks.dart';
 
 void main() {
@@ -48,24 +49,8 @@ void main() {
           favoritesRepository: favoritesRepository,
         );
         final List<ImageUiModel> expectedImageUiModelListOutput = [
-          ImageUiModel(
-            id: 'id1',
-            width: 1024,
-            height: 1024,
-            imageThumbnail: 'imageThumbnail',
-            originalImage: 'originalImage',
-            largeImage: 'largeImage',
-            isFavorite: true,
-          ),
-          ImageUiModel(
-            id: 'id2',
-            width: 1024,
-            height: 1024,
-            imageThumbnail: 'imageThumbnail',
-            originalImage: 'originalImage',
-            largeImage: 'largeImage',
-            isFavorite: true,
-          ),
+          buildTestImageUiModel(id: 'id1', isFavorite: true),
+          buildTestImageUiModel(id: 'id2', isFavorite: true),
         ];
         when(favoritesRepository.getFavorites()).thenAnswer((_) async => expectedImageUiModelListOutput);
 
@@ -108,15 +93,7 @@ void main() {
         final FavoritesScreenViewModel favoritesScreenViewModel = FavoritesScreenViewModel(
           favoritesRepository: favoritesRepository,
         );
-        final ImageUiModel imageUiModel = ImageUiModel(
-          id: 'id1',
-          width: 1024,
-          height: 1024,
-          imageThumbnail: 'imageThumbnail',
-          originalImage: 'originalImage',
-          largeImage: 'largeImage',
-          isFavorite: true,
-        );
+        final ImageUiModel imageUiModel = buildTestImageUiModel(id: 'id1', isFavorite: true);
         when(
           favoritesRepository.removeImageFromFavorites(imageId: imageUiModel.id),
         ).thenAnswer((_) async => FavoritesRepositorySuccessResult());
@@ -138,24 +115,8 @@ void main() {
           favoritesRepository: favoritesRepository,
         );
         final List<ImageUiModel> imagesList = [
-          ImageUiModel(
-            id: 'id1',
-            width: 1024,
-            height: 1024,
-            imageThumbnail: 'imageThumbnail',
-            originalImage: 'originalImage',
-            largeImage: 'largeImage',
-            isFavorite: true,
-          ),
-          ImageUiModel(
-            id: 'id2',
-            width: 1024,
-            height: 1024,
-            imageThumbnail: 'imageThumbnail',
-            originalImage: 'originalImage',
-            largeImage: 'largeImage',
-            isFavorite: true,
-          ),
+          buildTestImageUiModel(id: 'id1', isFavorite: true),
+          buildTestImageUiModel(id: 'id2', isFavorite: true),
         ];
         favoritesScreenViewModel.state = FavoritesStateSuccess(imagesList);
         when(
@@ -179,24 +140,8 @@ void main() {
         favoritesRepository: favoritesRepository,
       );
       final List<ImageUiModel> imagesList = [
-        ImageUiModel(
-          id: 'id1',
-          width: 1024,
-          height: 1024,
-          imageThumbnail: 'imageThumbnail',
-          originalImage: 'originalImage',
-          largeImage: 'largeImage',
-          isFavorite: true,
-        ),
-        ImageUiModel(
-          id: 'id2',
-          width: 1024,
-          height: 1024,
-          imageThumbnail: 'imageThumbnail',
-          originalImage: 'originalImage',
-          largeImage: 'largeImage',
-          isFavorite: true,
-        ),
+        buildTestImageUiModel(id: 'id1', isFavorite: true),
+        buildTestImageUiModel(id: 'id2', isFavorite: true),
       ];
       favoritesScreenViewModel.state = FavoritesStateSuccess(imagesList);
       when(

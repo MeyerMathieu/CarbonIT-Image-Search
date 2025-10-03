@@ -12,6 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
+import '../../tests_utils.dart';
 import 'search_screen_view_model_test.mocks.dart';
 
 // TODO : Move mocks in another file
@@ -43,8 +44,8 @@ void main() {
         ImageEntity(id: 'id2', width: 1024, height: 1024, alt: 'alt', source: testImageSourceEntity),
       ];
       final List<ImageUiModel> resultImagesItems = [
-        _buildTestImageUiModel(id: repositorySuccessResult.first.id),
-        _buildTestImageUiModel(id: repositorySuccessResult.last.id),
+        buildTestImageUiModel(id: repositorySuccessResult.first.id),
+        buildTestImageUiModel(id: repositorySuccessResult.last.id),
       ];
       when(imagesSearchRepository.searchImages(search: searchValue)).thenAnswer((_) async => repositorySuccessResult);
 
@@ -111,10 +112,10 @@ void main() {
           ImageEntity(id: 'id4', width: 1024, height: 1024, alt: 'alt', source: testImageSourceEntity),
         ];
         final List<ImageUiModel> resultImagesItems = [
-          _buildTestImageUiModel(id: 'id1'),
-          _buildTestImageUiModel(id: 'id2'),
-          _buildTestImageUiModel(id: 'id3'),
-          _buildTestImageUiModel(id: 'id4'),
+          buildTestImageUiModel(id: 'id1'),
+          buildTestImageUiModel(id: 'id2'),
+          buildTestImageUiModel(id: 'id3'),
+          buildTestImageUiModel(id: 'id4'),
         ];
         when(
           imagesSearchRepository.searchImages(search: searchValue, page: 1),
@@ -186,7 +187,7 @@ void main() {
         imagesSearchRepository: imagesSearchRepository,
         favoritesRepository: favoritesRepository,
       );
-      final ImageUiModel imageToAddToFavorites = _buildTestImageUiModel(id: '1');
+      final ImageUiModel imageToAddToFavorites = buildTestImageUiModel(id: '1');
       viewModel.state = SearchStateSuccess([imageToAddToFavorites]);
       when(
         favoritesRepository.saveImageToFavorites(imageUiModel: imageToAddToFavorites.copyWith(isFavorite: true)),
@@ -203,8 +204,8 @@ void main() {
     test('When the item is already in favorites, should remove it from repository', () async {
       // Given
       final List<ImageUiModel> searchItems = [
-        _buildTestImageUiModel(id: '1', isFavorite: true),
-        _buildTestImageUiModel(id: '2'),
+        buildTestImageUiModel(id: '1', isFavorite: true),
+        buildTestImageUiModel(id: '2'),
       ];
       final favoritesRepository = MockFavoritesRepository();
       final imagesSearchRepository = MockImagesSearchRepository();
@@ -243,8 +244,8 @@ void main() {
         favoritesRepository: favoritesRepository,
       );
       viewModel.state = SearchStateSuccess([
-        _buildTestImageUiModel(id: '1', isFavorite: true),
-        _buildTestImageUiModel(id: '2', isFavorite: true),
+        buildTestImageUiModel(id: '1', isFavorite: true),
+        buildTestImageUiModel(id: '2', isFavorite: true),
       ]);
 
       // When
@@ -257,14 +258,3 @@ void main() {
     });
   });
 }
-
-ImageUiModel _buildTestImageUiModel({required String id, bool isFavorite = false}) => ImageUiModel(
-  id: id,
-  width: 1024,
-  height: 1024,
-  alt: 'alt',
-  imageThumbnail: 'tiny',
-  originalImage: 'original',
-  largeImage: 'large',
-  isFavorite: isFavorite,
-);

@@ -1,4 +1,4 @@
-# carbon_it_images_search
+# CarbonIT Images Search
 
 CarbonIT technical test application
 
@@ -17,4 +17,4 @@ CarbonIT technical test application
 
 ## Demo
 
-<video src="carbon_it-search_app-demo.mp4" width="720" height="1280" controls></video>
+https://github.com/user-attachments/assets/85855211-638a-4a28-abe9-5e227eb29a5c

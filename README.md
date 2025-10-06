@@ -15,6 +15,15 @@ CarbonIT technical test application
 :white_check_mark: Displaying error / loading / empty / success states  
 ...
 
+## Usage
+
+Update `lib/injection.dart` line 38, replace `final apiKey = Secrets.apiKey;` with `final apiKey = "<your key here>";` or create a `lib/secrets.dart` file as this :
+```
+class Secrets {
+  static final apiKey = '<your key here>';
+}
+```
+
 ## Demo
 
 https://github.com/user-attachments/assets/85855211-638a-4a28-abe9-5e227eb29a5c
